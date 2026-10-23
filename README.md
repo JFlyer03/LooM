@@ -1,12 +1,12 @@
-# MemFactory - A Framework for Memory Processing and Reinforcement Learning
+# loom - A Framework for Memory Processing and Reinforcement Learning
 
 [中文](README.zh-CN.md) | English
 
-Paper: [arxiv](https://arxiv.org/abs/2603.29493) | [PDF](assets/MemFactory.pdf)
+Paper: [arxiv](https://arxiv.org/abs/2603.29493) | [PDF](assets/loom.pdf)
 
 ## Overview
 
-MemFactory is a modular framework for memory processing that integrates full memory lifecycle management with reinforcement learning training. It provides core components for memory extraction, update decisions, storage management, organization, retrieval, and response generation, while also supporting RL-based optimization of memory handling capabilities.
+loom is a modular framework for memory processing that integrates full memory lifecycle management with reinforcement learning training. It provides core components for memory extraction, update decisions, storage management, organization, retrieval, and response generation, while also supporting RL-based optimization of memory handling capabilities.
 
 ## 🏗️ Framework Architecture
 
@@ -58,8 +58,8 @@ From modules to agents to environments, the framework offers substantial flexibi
 
 ```bash
 # Clone the repository
-git clone git@github.com:MemTensor/MemFactory.git
-cd MemFactory
+git clone git@github.com:MemTensor/loom.git
+cd loom
 
 # Install dependencies
 pip install -r requirements.txt
@@ -91,16 +91,16 @@ bash examples/RunMemoryAgent1.7B.sh
 bash examples/RunMemoryAgent4B.sh
 ```
 
-The training data can be downloaded from [datas](https://huggingface.co/datasets/nworats/MemFactory). After downloading, update `DATA_PATH` and `MODEL_PATH` in the scripts to match your local environment. Once training is finished, you can use `evaluation/evaluate_orchestrator.py` to evaluate checkpoints on the three benchmark test sets used in the paper.
+The training data can be downloaded from [datas](https://huggingface.co/datasets/nworats/loom). After downloading, update `DATA_PATH` and `MODEL_PATH` in the scripts to match your local environment. Once training is finished, you can use `evaluation/evaluate_orchestrator.py` to evaluate checkpoints on the three benchmark test sets used in the paper.
 
 **Reported results in the paper** (avg@4, averaged over 4 independent runs):
 
 | Model | Setting | eval_50 | eval_100 | eval_fwe_16384 | Average |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Qwen3-1.7B | Base checkpoint | 0.4727 | 0.4297 | **0.0332** | 0.3118 |
-| Qwen3-1.7B | + MemFactory RL | **0.5684** | **0.4863** | 0.0195 | **0.3581** |
+| Qwen3-1.7B | + loom RL | **0.5684** | **0.4863** | 0.0195 | **0.3581** |
 | Qwen3-4B-Instruct | Base checkpoint | 0.6523 | 0.5645 | 0.6270 | 0.6146 |
-| Qwen3-4B-Instruct | + MemFactory RL | **0.7051** | **0.6309** | **0.6426** | **0.6595** |
+| Qwen3-4B-Instruct | + loom RL | **0.7051** | **0.6309** | **0.6426** | **0.6595** |
 
 ### 3. Further Extension
 See "🛠️ Developer Guide"
@@ -170,7 +170,7 @@ class YourNewEnv(MemoryBankEnv):
 
 ## 🤝 Contributing and Community
 
-Contributions to MemFactory are welcome.
+Contributions to loom are welcome.
 
 ## 📄 License
 
@@ -178,11 +178,11 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 ## 📖 Citation
 
-If you find MemFactory useful for your research, please cite our paper:
+If you find loom useful for your research, please cite our paper:
 
 ```bibtex
-@misc{guo2026memfactoryunifiedinference,
-      title={MemFactory: Unified Inference & Training Framework for Agent Memory}, 
+@misc{guo2026loomunifiedinference,
+      title={loom: Unified Inference & Training Framework for Agent Memory}, 
       author={Ziliang Guo and Ziheng Li and Bo Tang and Feiyu Xiong and Zhiyu Li},
       year={2026},
       eprint={2603.29493},

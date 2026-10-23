@@ -8,8 +8,8 @@ set -x
 # 1. Paths
 # Assuming same model and output structure
 DATA_PATH="./datas/train.jsonl" # Use the train data from reference code context
-MODEL_NAME="Qwen3-1.7B"
-MODEL_PATH="/home/models/${MODEL_NAME}"
+MODEL_NAME="Qwen--Qwen3-1.7B"
+MODEL_PATH="/public/home/jiangfeibing/.cache/modelscope/models/${MODEL_NAME}"
 OUTPUT_DIR="./output/mem_r1_qwen3_1.7b"
 
 # 2. Environment & Agent Configuration

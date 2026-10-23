@@ -8,10 +8,10 @@ import swanlab
 # Add project root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from memfactory.trainers.mem_grpo_trainer import MemGRPOTrainer, MemGRPOArguments
-import memfactory.envs  # Register envs
-import memfactory.modules # Register modules
-import memfactory.agents # Register agents
+from loom.trainers.mem_grpo_trainer import MemGRPOTrainer, MemGRPOArguments
+import loom.envs  # Register envs
+import loom.modules # Register modules
+import loom.agents # Register agents
 
 def main():
     parser = HfArgumentParser((MemGRPOArguments,))
@@ -63,7 +63,7 @@ def main():
         else:
             print("Warning: SWANLAB_API_KEY is still using the placeholder value.")
         swanlab.init(
-            project="MemFactory",
+            project="loom",
             config=vars(grpo_args),
             name=args.wandb_name
         )

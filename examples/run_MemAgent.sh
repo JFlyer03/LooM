@@ -2,7 +2,7 @@
 set -x
 
 # ----------------------------------------------------------------------------
-# Configuration for MemFactory Training
+# Configuration for loom Training
 # ----------------------------------------------------------------------------
 
 # 1. Paths
@@ -38,7 +38,7 @@ SAVE_STEPS=1000
 # Assuming script is run from project root or examples/ folder
 cd "$(dirname "$0")/.." # Go to project root
 
-echo "Starting MemFactory Training..."
+echo "Starting loom Training..."
 echo "Model: $MODEL_NAME"
 echo "Env: $ENV_TYPE | Agent: $AGENT_TYPE"
 
@@ -57,5 +57,5 @@ python3 examples/train_mem_grpo.py \
     --save_steps "$SAVE_STEPS" \
     --env_type "$ENV_TYPE" \
     --agent_type "$AGENT_TYPE" \
-    --wandb_name "memfactory_${AGENT_TYPE}_${ENV_TYPE}_${MODEL_NAME}" \
+    --wandb_name "loom_${AGENT_TYPE}_${ENV_TYPE}_${MODEL_NAME}" \
     --epoch 5

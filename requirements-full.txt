@@ -109,7 +109,7 @@ matplotlib-inline==0.2.1
 mcp==1.25.0
 mdurl==0.1.2
 mem0ai==1.0.2
-memfactory==0.1.0
+loom==0.1.0
 mistral_common==1.8.8
 mmengine==0.10.7
 model-hosting-container-standards==0.1.13

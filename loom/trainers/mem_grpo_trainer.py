@@ -26,7 +26,7 @@ class MemGRPOArguments:
     batch_size: int = 1
     gradient_checkpointing: bool = True
     
-    # MemFactory specific
+    # loom specific
     agent_type: str = "naive"
     env_type: str = "longcontext"
     max_chunk_number: int = 5

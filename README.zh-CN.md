@@ -1,12 +1,12 @@
-# MemFactory - 记忆处理与强化学习框架
+# loom - 记忆处理与强化学习框架
 
 中文 | [English](README.md)
 
-论文：[arxiv](https://arxiv.org/abs/2603.29493) | [PDF](assets/MemFactory.pdf)
+论文：[arxiv](https://arxiv.org/abs/2603.29493) | [PDF](assets/loom.pdf)
 
 ## 项目简介
 
-MemFactory是一个模块化的记忆处理框架，集成了完整的记忆生命周期管理功能，同时内置强化学习训练支持。该框架提供了记忆抽取、更新决策、存储管理、组织构建、检索回答等核心模块，并支持通过强化学习优化记忆处理能力。
+loom是一个模块化的记忆处理框架，集成了完整的记忆生命周期管理功能，同时内置强化学习训练支持。该框架提供了记忆抽取、更新决策、存储管理、组织构建、检索回答等核心模块，并支持通过强化学习优化记忆处理能力。
 
 ## 🏗️ 框架架构
 
@@ -60,8 +60,8 @@ MemFactory是一个模块化的记忆处理框架，集成了完整的记忆生�
 
 ```bash
 # 克隆项目
-git clone git@github.com:MemTensor/MemFactory.git
-cd MemFactory
+git clone git@github.com:MemTensor/loom.git
+cd loom
 
 # 安装依赖
 pip install -r requirements.txt
@@ -93,16 +93,16 @@ bash examples/RunMemoryAgent1.7B.sh
 bash examples/RunMemoryAgent4B.sh
 ```
 
-训练数据可从 [datas](https://huggingface.co/datasets/nworats/MemFactory) 获取。下载后，请将脚本中的 `DATA_PATH` 和 `MODEL_PATH` 修改为本地环境对应的路径。训练完成后，可使用 `evaluation/evaluate_orchestrator.py` 在论文中的三个测试集上完成评测。
+训练数据可从 [datas](https://huggingface.co/datasets/nworats/loom) 获取。下载后，请将脚本中的 `DATA_PATH` 和 `MODEL_PATH` 修改为本地环境对应的路径。训练完成后，可使用 `evaluation/evaluate_orchestrator.py` 在论文中的三个测试集上完成评测。
 
 **论文结果（avg@4，4 次独立试验平均）：**
 
 | Model | Setting | eval_50 | eval_100 | eval_fwe_16384 | Average |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Qwen3-1.7B | Base checkpoint | 0.4727 | 0.4297 | **0.0332** | 0.3118 |
-| Qwen3-1.7B | + MemFactory RL | **0.5684** | **0.4863** | 0.0195 | **0.3581** |
+| Qwen3-1.7B | + loom RL | **0.5684** | **0.4863** | 0.0195 | **0.3581** |
 | Qwen3-4B-Instruct | Base checkpoint | 0.6523 | 0.5645 | 0.6270 | 0.6146 |
-| Qwen3-4B-Instruct | + MemFactory RL | **0.7051** | **0.6309** | **0.6426** | **0.6595** |
+| Qwen3-4B-Instruct | + loom RL | **0.7051** | **0.6309** | **0.6426** | **0.6595** |
 
 ### 3. 二次创新
 见“🛠️ 开发指南”
@@ -174,7 +174,7 @@ class YourNewEnv(MemoryBankEnv):
 
 ## 🤝 贡献与社区
 
-欢迎参与MemFactory框架的开发和改进！
+欢迎参与loom框架的开发和改进！
 
 
 ## 📄 许可证
@@ -183,11 +183,11 @@ class YourNewEnv(MemoryBankEnv):
 
 ## 📖 引用
 
-如果 MemFactory 对您的研究有所帮助，请引用我们的论文：
+如果 loom 对您的研究有所帮助，请引用我们的论文：
 
 ```bibtex
-@misc{guo2026memfactoryunifiedinference,
-      title={MemFactory: Unified Inference & Training Framework for Agent Memory}, 
+@misc{guo2026loomunifiedinference,
+      title={loom: Unified Inference & Training Framework for Agent Memory}, 
       author={Ziliang Guo and Ziheng Li and Bo Tang and Feiyu Xiong and Zhiyu Li},
       year={2026},
       eprint={2603.29493},
