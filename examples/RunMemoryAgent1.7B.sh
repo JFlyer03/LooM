@@ -4,11 +4,12 @@ set -x
 # ----------------------------------------------------------------------------
 # Configuration for loom Training
 # ----------------------------------------------------------------------------
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 # 1. Paths
 DATA_PATH="./datas/converted_hotpotqa_2000.json"
 MODEL_NAME="Qwen3-1.7B"
-MODEL_PATH="./models/${MODEL_NAME}"
+MODEL_PATH="/public/home/jiangfeibing/.cache/modelscope/models/Qwen--Qwen3-1.7B/snapshots/master"
 OUTPUT_DIR="./output/MemoryAgent1.7B"
 
 # 2. Environment & Agent Configuration

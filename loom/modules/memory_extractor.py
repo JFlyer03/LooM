@@ -53,6 +53,7 @@ class NaiveExtractor(BaseModule):
         self.tokenizer.padding_side = "left"
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
+    
     def _generate_with_pytorch(self, model, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
             outputs = model.generate(

@@ -213,7 +213,7 @@ class EmbeddingClient:
             base_url=EMBEDDING_BASE_URL
         )
         self.model = EMBEDDING_MODEL
-        self.dim = EMBEDDING_DIM  # BGE-M3 默认1024维
+        self.dim = EMBEDDING_DIM
         self._use_mock = True  # 默认使用mock（如果API不可用）
         self._initialized = True
         print(f"[EmbeddingClient] 已初始化，模型: {self.model}, 服务地址: {EMBEDDING_BASE_URL}")

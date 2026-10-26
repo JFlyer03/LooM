@@ -81,6 +81,7 @@ class MemGRPOTrainer:
         action_mask = inputs['action_mask']
         num_actions = inputs['old_action_log_probs'].size(1)
         
+        # 为当前策略概率建立梯度计算图
         action_log_probs = self.get_action_log_probs(model, prompt_response_ids, attention_mask, num_actions)
         
         k3 = None
@@ -124,7 +125,9 @@ class MemGRPOTrainer:
             scale_factor = mini_batch_size / total_samples
             scaled_loss = loss * scale_factor
             
+            # 反向传播，累计梯度
             if self.scaler:
+                # scaler放大损失，以减轻低精度训练中的梯度下溢；更新前再将梯度还原
                  with torch.amp.autocast(device_type='cuda'):
                      self.scaler.scale(scaled_loss / self.args.gradient_accumulation_steps).backward()
             else:
@@ -135,15 +138,15 @@ class MemGRPOTrainer:
         if (step + 1) % self.args.gradient_accumulation_steps == 0:
             if self.scaler:
                 self.scaler.unscale_(self.optimizer)
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)    # 梯度裁剪：把整体梯度范数限制到不超过 1.0，避免过大的更新。
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
-            else:
+            else:           
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-                self.optimizer.step()
-            self.optimizer.zero_grad()
+                self.optimizer.step()       # 参数更新：优化器根据梯度修改模型权重。
+            self.optimizer.zero_grad()      # 清空梯度：为下一轮累积做准备。
 
-            swanlab.log({"train/loss": total_loss, "step": self.update_steps})
+            swanlab.log({"train/loss": total_loss, "step": self.update_steps})  # 当前这次 train_step() 的加权平均损失
             if self.update_steps % 10 == 0:
                 print(f"Step {self.update_steps}: Loss {total_loss:.4f}")
 
@@ -205,6 +208,7 @@ class MemGRPOTrainer:
             max_generate_length=self.args.max_generate_length
         )
 
+        # 3. Initialize DataLoader
         dataloader = DataLoader(env, batch_size=self.args.batch_size, shuffle=self.args.do_shuffle, collate_fn=env.collate_fn)
         
         # Define reward function wrapper

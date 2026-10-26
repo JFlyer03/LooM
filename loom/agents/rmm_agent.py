@@ -29,6 +29,8 @@ class MemoryRMMAgent(BaseAgent):
         self.num_generations = kwargs.get("num_generations", 4)
         
     def process_samples(self, prompts: List[str], responses: List[str], rewards: torch.Tensor, step_type: str) -> Samples:
+        # Organize the prompts, model responses, and rewards into Sample objects required for GRPO training.
+        
         # Tokenize and Pad logic adapted from MemoryAgent
         prompts_ids = [self.tokenizer.encode(p, add_special_tokens=False) for p in prompts]
         responses_ids = [self.tokenizer.encode(r, add_special_tokens=False) + [self.tokenizer.eos_token_id] for r in responses]

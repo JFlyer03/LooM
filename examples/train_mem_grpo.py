@@ -15,12 +15,8 @@ import loom.agents # Register agents
 
 def main():
     parser = HfArgumentParser((MemGRPOArguments,))
-    # Also parse standard args for model/data path if not in dataclass
-    # But for simplicity, let's assume we pass them via CLI and map them manually or add them to dataclass.
-    # The MemGRPOArguments I defined earlier didn't have model_path/data_path fields (oops, I should have added them or use a separate dataclass).
-    # Let's check MemGRPOArguments definition in trainers/mem_grpo_trainer.py
-    # It has output_dir, device, etc. but NOT model_name_or_path or data_path.
-    # I should add a separate dataclass for Model/Data args or just use argparse for them.
+    # # MemGRPOArguments does not define model_path/data_path fields, 
+    # so use a separate dataclass or argparse to handle the model/data paths.
     
     # Let's use argparse for the main script wrapper, and then populate MemGRPOArguments.
     cli_parser = argparse.ArgumentParser()

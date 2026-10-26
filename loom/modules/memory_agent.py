@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn.functional as F
 from typing import Dict, Any, List, Optional, Tuple
@@ -17,23 +18,36 @@ class RecurrentMemoryModule(BaseModule):
         self.max_chunk_number = kwargs.get("max_chunk_number", 5)
         self.num_generations = kwargs.get("num_generations", 16)
         self.max_generate_length = kwargs.get("max_generate_length", 2048)
+        self.generation_batch_size = int(os.environ.get("LOOM_GENERATION_BATCH_SIZE", "2"))
+        if self.generation_batch_size < 1:
+            raise ValueError("LOOM_GENERATION_BATCH_SIZE must be positive")
         
         self.tokenizer.padding_side = "left"
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def _generate_with_pytorch(self, model, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        output_batches = []
         with torch.no_grad():
-            outputs = model.generate(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                max_new_tokens=self.max_generate_length,
-                temperature=1.0,
-                pad_token_id=self.tokenizer.pad_token_id,
-                eos_token_id=self.tokenizer.eos_token_id,
-                do_sample=True
-            )
-        return outputs
+            for start in range(0, input_ids.size(0), self.generation_batch_size):
+                end = start + self.generation_batch_size
+                outputs = model.generate(
+                    input_ids=input_ids[start:end],
+                    attention_mask=attention_mask[start:end],
+                    max_new_tokens=self.max_generate_length,
+                    temperature=1.0,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                    eos_token_id=self.tokenizer.eos_token_id,
+                    do_sample=True
+                )
+                output_batches.append(outputs)
+        # Batches can stop at different EOS positions; preserve row order and
+        # right-pad to a common length for the existing decoding code.
+        max_length = max(batch.size(1) for batch in output_batches)
+        return torch.cat([
+            F.pad(batch, (0, max_length - batch.size(1)), value=self.tokenizer.pad_token_id)
+            for batch in output_batches
+        ], dim=0)
 
     def rollout(self, model: Any, batch_data: Dict[str, Any], **kwargs) -> Optional[List[Tuple[str, str, float]]]:
         """

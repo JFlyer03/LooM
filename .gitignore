@@ -1,5 +1,5 @@
-# MemOS home
-.memos/
+slime/
+MemAgent/
 
 # RL train
 
@@ -10,6 +10,7 @@ experiments/*.sh
 *copy*.sh
 *True*.sh
 *.parquet
+
 
 # Temporary files
 tmp/
