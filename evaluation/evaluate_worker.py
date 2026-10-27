@@ -10,7 +10,7 @@ import sys
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
-from loom.common.utils import TEMPLATE, TEMPLATE_FINAL_BOXED, evaluate_memory_agent, LLMClient
+from loom_agent.common.utils import TEMPLATE, TEMPLATE_FINAL_BOXED, evaluate_memory_agent, LLMClient
 
 def process_dataset(dataset_path):
     with open(dataset_path, 'r', encoding='utf-8') as f:

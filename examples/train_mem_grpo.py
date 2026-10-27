@@ -8,10 +8,10 @@ import swanlab
 # Add project root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from loom.trainers.mem_grpo_trainer import MemGRPOTrainer, MemGRPOArguments
-import loom.envs  # Register envs
-import loom.modules # Register modules
-import loom.agents # Register agents
+from loom_agent.trainers.mem_grpo_trainer import MemGRPOTrainer, MemGRPOArguments
+import loom_agent.envs  # Register envs
+import loom_agent.modules # Register modules
+import loom_agent.agents # Register agents
 
 def main():
     parser = HfArgumentParser((MemGRPOArguments,))

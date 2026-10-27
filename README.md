@@ -72,6 +72,13 @@ cp .env.example .env
 ```
 
 ### 2. Launch RL Training
+
+The new memory-runtime implementation lives in `loom`, using the
+`loom` Python namespace. See its [setup and MemAgent guide](loom/README.md)
+and the [implementation plan](docs/memory_agent_framework_plan.md).
+The original implementation is preserved in `loom_agent`; the new path
+uses SkyRL's native trainer rather than the legacy loom trainer.
+
 We provide reinforcement learning examples under `examples/`. Currently supported:
 
 (1) Inspired by `Memory-R1`, optimizing the agent's memory extraction and update policies.

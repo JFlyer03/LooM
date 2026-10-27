@@ -250,7 +250,6 @@ class MemGRPOTrainer:
                     for _ in range(self.args.num_iterations):
                         # Iterate over all types of samples returned by rollout
                         for step_type, samples in samples_dict.items():
-                            
                             should_train = True
                             if step_type == 'extraction' and not self.args.train_extraction:
                                 should_train = False

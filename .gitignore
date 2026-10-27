@@ -1,8 +1,9 @@
 slime/
 MemAgent/
+SkyRL/
+skyrl-agent/
 
 # RL train
-
 output/
 */output/*
 output
