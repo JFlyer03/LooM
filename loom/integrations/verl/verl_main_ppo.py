@@ -32,7 +32,17 @@ from collections import defaultdict
 
 from verl.workers.reward_manager import register
 from verl.protocol import DataProto
-from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler, config_dir
+from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler
+
+try:
+    from verl.trainer.main_ppo import config_dir
+except ImportError:
+    # verl <= 0.5.0 declares the Hydra config path inline instead of exporting config_dir.
+    from pathlib import Path
+
+    import verl.trainer.main_ppo as _verl_main_ppo
+
+    config_dir = str(Path(_verl_main_ppo.__file__).parent / "config")
 
 
 @register("skyagent")
@@ -122,6 +132,9 @@ def run_ppo(config) -> None:
                 for distributed PPO training including Ray initialization settings,
                 model paths, and training hyperparameters.
     """
+    from .memory_adapter import validate_memory_training
+
+    validate_memory_training(config)
     # Check if Ray is not initialized
     if not ray.is_initialized():
         # Initialize Ray with a local cluster configuration
@@ -130,7 +143,10 @@ def run_ppo(config) -> None:
         # `num_cpus` specifies the number of CPU cores Ray can use, obtained from the configuration
 
         # use V1 for async engine
-        PPO_RAY_RUNTIME_ENV["env_vars"].update({"VLLM_USE_V1": "1"})
+        memory_v0 = OmegaConf.select(config, "actor_rollout_ref.rollout.memory_task_yaml") is not None
+        PPO_RAY_RUNTIME_ENV["env_vars"].update({"VLLM_USE_V1": "0" if memory_v0 else "1"})
+        if memory_v0:
+            PPO_RAY_RUNTIME_ENV["env_vars"]["VLLM_ATTENTION_BACKEND"] = "XFORMERS"
         if os.environ.get("LD_LIBRARY_PATH", None):
             # export LD_LIBRARY_PATH path from driver process, needed for EFA on Anyscale rn
             print("Exporting `LD_LIBRARY_PATH` from driver")
@@ -251,6 +267,10 @@ class TaskRunner:
                 if config.actor_rollout_ref.rollout.mode == "async"
                 else ActorRolloutRefWorker
             )
+            if OmegaConf.select(config, "actor_rollout_ref.rollout.memory_task_yaml"):
+                from .memory_v0 import MemoryV0Worker
+
+                actor_rollout_cls = MemoryV0Worker
             ray_worker_group_cls = RayWorkerGroup
 
         elif config.actor_rollout_ref.actor.strategy == "megatron":

@@ -19,7 +19,6 @@ This trainer supports model-agonistic model initialization with huggingface
 """
 
 import os
-import uuid
 from collections import defaultdict
 from copy import deepcopy
 from pprint import pprint
@@ -50,9 +49,12 @@ from verl.utils.debug import marked_timer
 from verl.utils.metric import (
     reduce_metrics,
 )
-from verl.trainer.ppo.ray_trainer import Role, compute_advantage, RayPPOTrainer
+from verl.trainer.ppo.ray_trainer import (
+    Role, ResourcePoolManager, compute_advantage, compute_response_mask, apply_kl_penalty, RayPPOTrainer,
+)
 
 from .upload_utils import upload_to_remote_background
+from .memory_adapter import align_rollout_batch, compute_stepwise_advantage
 
 
 WorkerType = type[Worker]
@@ -189,6 +191,9 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
             if self.async_rollout_mode
             else 1
         )
+        memory_task_yaml = OmegaConf.select(self.config, "actor_rollout_ref.rollout.memory_task_yaml")
+        if memory_task_yaml:
+            val_num_trajectories = OmegaConf.load(memory_task_yaml).generator.val_config.num_trajectories
 
         for test_data in self.val_dataloader:
             test_batch = DataProto.from_single_dict(test_data)
@@ -298,7 +303,11 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                 sample_turns.append(test_batch.non_tensor_batch["__num_turns__"])
 
             if "data_source" in test_gen_batch.non_tensor_batch:
-                data_source_lst.append(test_gen_batch.non_tensor_batch["data_source"].copy())
+                if "_loom_source_index" in test_output_gen_batch.non_tensor_batch:
+                    source_indices = test_output_gen_batch.non_tensor_batch["_loom_source_index"]
+                    data_source_lst.append(test_gen_batch.non_tensor_batch["data_source"][source_indices])
+                else:
+                    data_source_lst.append(test_gen_batch.non_tensor_batch["data_source"].copy())
 
         self._maybe_log_val_generations(inputs=sample_inputs, outputs=sample_outputs, scores=sample_scores)
 
@@ -504,12 +513,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
 
                             del gen_baseline_batch, gen_baseline_output
 
-                    batch.non_tensor_batch["uid"] = np.array(
-                        [str(uuid.uuid4()) for _ in range(len(batch.batch))], dtype=object
-                    )
-                    # repeat to align with repeated responses in rollout
-                    batch = batch.repeat(repeat_times=self.config.skyrl_agent.num_trajectories, interleave=True)
-                    batch = batch.union(gen_batch_output)
+                    batch = align_rollout_batch(batch, gen_batch_output, self.config.skyrl_agent.num_trajectories)
 
                     rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
                     if rollout_data_dir:
@@ -624,8 +628,9 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                             "norm_adv_by_std_in_grpo", True
                         )  # GRPO adv normalization factor
 
-                        batch = compute_advantage(
+                        batch = compute_stepwise_advantage(
                             batch,
+                            compute_advantage=compute_advantage,
                             adv_estimator=self.config.algorithm.adv_estimator,
                             gamma=self.config.algorithm.gamma,
                             lam=self.config.algorithm.lam,

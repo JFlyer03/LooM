@@ -15,6 +15,14 @@ class MemoryGenerator:
         self.runner = AutoAgentRunner.from_task(
             generator_cfg.task, infer_engine=inference_engine_client, tokenizer=tokenizer,
         )
+        if self.runner.cfg.agent_cls.endswith("MemoryR1Agent"):
+            stages = self.runner.cfg.memory.get("trainable_stages", ["extraction", "update"])
+            if len(stages) != 1:
+                raise ValueError(
+                    "Native step-wise SkyRL broadcasts one advantage per trajectory. "
+                    "For Memory-R1 select one trainable_stages entry per run; joint training "
+                    "with separate extraction/update advantages needs a multi-objective adapter."
+                )
 
     async def generate(self, input_batch):
         ids = input_batch.get("trajectory_ids")

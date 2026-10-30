@@ -1,11 +1,8 @@
 import asyncio
 from typing import Any, Dict, Optional
 
-import numpy as np
 import ray
-import torch
 from omegaconf import DictConfig
-from tensordict import TensorDict
 
 from verl.protocol import DataProto
 from verl.single_controller.ray.base import RayWorkerGroup
@@ -82,7 +79,7 @@ class SkyAgentLoopManager(AgentLoopManager):
         # init generator
         self.server_manager = AsyncLLMServerManager(config, self.async_llm_servers)
         self.skyagent_generator = AutoAgentRunner.from_task(
-            task_yaml=config.skyrl_agent.task_yaml, infer_engine=self.server_manager, tokenizer=self.tokenizer
+            task=config.skyrl_agent.task_yaml, infer_engine=self.server_manager, tokenizer=self.tokenizer
         )
 
         # Initially we're in sleep mode.
@@ -137,74 +134,10 @@ class SkyAgentLoopManager(AgentLoopManager):
         # All server instances are ready, init AsyncLLM engine.
         ray.get([server.init_engine.remote() for server in self.async_llm_servers])
 
-    def _postprocess(self, inputs: Dict[str, list[Any]]) -> DataProto:
-        # NOTE: consistent with batch version of generate_sequences in vllm_rollout_spmd.py
-        # prompts: left pad
-        # responses: right pad
-        # input_ids: prompt + response
-        # attention_mask: [0,0,0,0,1,1,1,1, | 1,1,1,0,0,0,0,0]
-        # position_ids:   [0,0,0,0,0,1,2,3, | 4,5,6,7,8,9,10,11]
+    def _postprocess(self, inputs: Dict[str, list[Any]], val_mode=False) -> DataProto:
+        from .rollout_data import pack_rollout
 
-        # inputs
-        self.tokenizer.padding_side = "left"
-        max_prompt_length = max(
-            max([len(input_ids) for input_ids in inputs["prompt_token_ids"]]),
-            self.config.actor_rollout_ref.rollout.prompt_length,
-        )
-        outputs = self.tokenizer.pad(
-            [{"input_ids": input_ids} for input_ids in inputs["prompt_token_ids"]],
-            padding="max_length",
-            max_length=max_prompt_length,
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-        prompt_ids, prompt_attention_mask = outputs["input_ids"], outputs["attention_mask"]
-
-        # responses
-        self.tokenizer.padding_side = "right"
-        max_response_length = max(
-            max([len(response) for response in inputs["response_ids"]]),
-            self.config.actor_rollout_ref.rollout.response_length,
-        )
-        outputs = self.tokenizer.pad(
-            [{"input_ids": response_ids} for response_ids in inputs["response_ids"]],
-            padding="max_length",
-            max_length=max_response_length,
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-        response_ids, response_attention_mask = outputs["input_ids"], outputs["attention_mask"]
-
-        # response_mask
-        response_length = response_ids.shape[1]
-        loss_masks = [loss_mask + [0] * (response_length - len(loss_mask)) for loss_mask in inputs["loss_masks"]]
-        response_mask = torch.tensor(loss_masks, dtype=torch.long)
-        assert (
-            response_ids.shape == response_mask.shape
-        ), f"mismatch in response_ids and response_mask shape: {response_ids.shape} vs {response_mask.shape}"
-        response_mask = response_mask * response_attention_mask
-
-        input_ids = torch.cat([prompt_ids, response_ids], dim=1)
-        attention_mask = torch.cat([prompt_attention_mask, response_attention_mask], dim=1)
-        position_ids = (attention_mask.cumsum(dim=1) - 1) * attention_mask
-
-        batch = TensorDict(
-            {
-                "prompts": prompt_ids,  # [bsz, prompt_length]
-                "responses": response_ids,  # [bsz, response_length]
-                "response_mask": response_mask,  # [bsz, response_length]
-                "input_ids": input_ids,  # [bsz, prompt_length + response_length]
-                "attention_mask": attention_mask,  # [bsz, prompt_length + response_length]
-                "position_ids": position_ids,  # [bsz, prompt_length + response_length]
-            },
-            batch_size=len(input_ids),
-        )
-
-        return DataProto(
-            batch=batch,
-            non_tensor_batch={"rewards": np.array(inputs["rewards"])},
-            meta_info={"rollout_metrics": inputs["rollout_metrics"], "timing": {}},
-        )
+        return pack_rollout(inputs, self.tokenizer, self.config.actor_rollout_ref.rollout, val_mode)
 
     def generate_sequences(self, prompts: DataProto) -> DataProto:
         """Split input batch and dispatch to agent loop workers.
@@ -220,7 +153,7 @@ class SkyAgentLoopManager(AgentLoopManager):
         skyagent_output = asyncio.run(
             self.skyagent_generator.run(prompts, val_mode=prompts.meta_info.get("val_mode", False))
         )
-        output = self._postprocess(skyagent_output)
+        output = self._postprocess(skyagent_output, val_mode=prompts.meta_info.get("val_mode", False))
         if self.config.actor_rollout_ref.rollout.free_cache_engine:
             self.sleep()
 

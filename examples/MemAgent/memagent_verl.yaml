@@ -1,0 +1,46 @@
+# Fixed MemAgent workflow; training and inference are supplied by VeRL.
+agent_cls: loom.agents.memory.MemAgent
+task: loom.tasks.memory.LongContextMemoryTask
+tools: []
+
+data:
+  instance_key: instance
+  instance_id_key: __loom_uid
+  data_source_key: data_source
+
+memory:
+  module_cls: loom.modules.memory_agent.RecurrentMemoryModule
+  chunk_size: 5000
+  max_chunk_number: 7
+  max_memorization_length: 1024
+  max_final_response_length: 1024
+  reward_mode: memagent
+
+generator:
+  infer_backend: verl
+  backend_config: null
+  num_trajectories: 16
+  max_iterations: 8
+  max_prompt_length: 7168
+  sampling_params:
+    temperature: 1.0
+    top_p: 1.0
+    max_tokens: 1024
+  val_config:
+    num_trajectories: 4
+    sampling_params:
+      temperature: 1.0
+      top_p: 0.7
+      max_tokens: 1024
+  remove_think_tokens: false
+  vision_is_active: false
+  qwen3_enable_thinking: false
+  qwen3_acc_thinking: false
+
+dispatcher:
+  type: async_batch
+  max_parallel_agents: 2
+  max_eval_parallel_agents: 2
+  val_config:
+    max_parallel_agents: 2
+    max_eval_parallel_agents: 2

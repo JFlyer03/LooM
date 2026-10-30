@@ -1,3 +1,6 @@
+import asyncio
+from copy import deepcopy
+
 from ..base import AgentRunner, BaseTrajectory
 from ...functional.utils import transitions_to_training_data
 
@@ -8,7 +11,14 @@ class MemoryTrajectory(BaseTrajectory):
         self.agent = self.agent_cls(self.cfg, self.infer_engine, self.tokenizer)
 
     async def generate_trajectory(self):
-        finish_reason, result = await self.agent.run(self.instance)
+        if hasattr(self.agent, "prepare_shared"):
+            shared = self.shared_preparation
+            if "task" not in shared:
+                shared["task"] = asyncio.create_task(self.agent.prepare_shared(self.instance))
+            prepared = deepcopy(await shared["task"])
+            finish_reason, result = await self.agent.run(self.instance, prepared=prepared)
+        else:
+            finish_reason, result = await self.agent.run(self.instance)
         self.result = {
             "instance_id": self.cfg.instance_id,
             "trajectory_id": self.cfg.trajectory_id,
@@ -24,8 +34,19 @@ class MemoryTrajectory(BaseTrajectory):
         reward = 0.0
         if self.result["finish"]:
             reward = await self.task.evaluate_result(self.result["results"], self.instance, self.cfg.memory)
+        if isinstance(reward, dict):
+            self.result["stage_rewards"] = reward
+            selected = (self.cfg.memory or {}).get("trainable_stages", list(reward))
+            if not selected or any(stage not in reward for stage in selected):
+                raise ValueError("trainable_stages must name evaluated memory stages")
+            for transition in self.agent.transitions:
+                transition.reward = float(reward[transition.metrics["stage"]])
+                transition.metrics["stage_reward"] = transition.reward
+            self.result["separate_stage_rewards"] = len(selected) > 1
+            reward = sum(reward[stage] for stage in selected) / len(selected)
         self.result["reward"] = float(reward)
-        self.agent.transitions[-1].reward = float(reward)
+        if "stage_rewards" not in self.result:
+            self.agent.transitions[-1].reward = float(reward)
 
 
 class MemoryAgentRunner(AgentRunner):
@@ -33,6 +54,13 @@ class MemoryAgentRunner(AgentRunner):
 
     Each reset context is a separate training row with the same trajectory key.
     """
+
+    def _initialize_trajectories(self, val_mode=False):
+        super()._initialize_trajectories(val_mode=val_mode)
+        for trajectories in self.trajectories.values():
+            shared = {}
+            for trajectory in trajectories.values():
+                trajectory.shared_preparation = shared
 
     async def run(self, input_batch, val_mode=False):
         if getattr(self, "_running", False):
@@ -67,8 +95,11 @@ class MemoryAgentRunner(AgentRunner):
                 for i, (row, transition) in enumerate(zip(rows, transitions)):
                     output["prompt_token_ids"].append(row.input_tokens)
                     output["response_ids"].append(row.response_tokens)
-                    output["loss_masks"].append([int(valid)] * len(row.response_tokens))
-                    output["rewards"].append(reward)
+                    trainable = transition.metrics.get("trainable", True)
+                    output["loss_masks"].append([int(valid and trainable)] * len(row.response_tokens))
+                    output["rewards"].append(
+                        float(transition.reward) if result.get("separate_stage_rewards") else reward
+                    )
                     output["stop_reasons"].append(transition.metrics["stop_reason"])
                     output["rollout_logprobs"].append(row.response_logprobs)
                     all_have_logprobs &= transition.ac.logprobs is not None

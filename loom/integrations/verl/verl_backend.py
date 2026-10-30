@@ -38,6 +38,7 @@ class VeRLGeneratorInput(GeneratorInput):
         num_entries = len(non_tensor_batch[first_key])
         for i in range(num_entries):
             data_item: dict = {key: non_tensor_batch[key][i] for key in non_tensor_batch.keys()}
+            data_item["__loom_uid"] = str(i)
             self.input_batch.append(data_item)
         logger.info(f"input batch of size: {len(self.input_batch)}")
         logger.info(f"keys: {self.input_batch[0].keys()}")

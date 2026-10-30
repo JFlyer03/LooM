@@ -1,3 +1,4 @@
+# Fixed MemAgent workflow: update each chunk's memory, then generate an answer.
 agent_cls: loom.agents.memory.MemAgent
 task: loom.tasks.memory.LongContextMemoryTask
 tools: []
@@ -8,31 +9,34 @@ data:
   data_source_key: data_source
 
 memory:
-  chunk_size: 2500
-  max_chunk_number: 6
-  # llm_judge preserves the old loom reward's boxed-answer + external judge setup.
-  # exact_match is an explicit alternative for offline checks, not an equivalent scorer.
-  reward_mode: llm_judge
+  module_cls: loom.modules.memory_agent.RecurrentMemoryModule
+  chunk_size: 5000
+  max_chunk_number: 7
+  max_memorization_length: 1024
+  max_final_response_length: 1024
+  # Official MemAgent training verifier; no external judge API is required.
+  reward_mode: memagent
 
 generator:
   infer_backend: skyrl-train
   backend_config: null
   num_trajectories: 16
-  max_iterations: 7
-  max_prompt_length: 6000
+  max_iterations: 8
+  # 7168 input + 1024 output = an 8192-token context window.
+  max_prompt_length: 7168
   sampling_params:
     temperature: 1.0
     top_p: 1.0
-    max_tokens: 2500
+    max_tokens: 1024
   val_config:
-    num_trajectories: 1
+    num_trajectories: 4
     sampling_params:
-      temperature: 0.0
-      top_p: 1.0
-      max_tokens: 2500
+      temperature: 1.0
+      top_p: 0.7
+      max_tokens: 1024
   remove_think_tokens: false
   vision_is_active: false
-  qwen3_enable_thinking: true
+  qwen3_enable_thinking: false
   qwen3_acc_thinking: false
 
 dispatcher:

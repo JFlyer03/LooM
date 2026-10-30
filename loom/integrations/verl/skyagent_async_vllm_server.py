@@ -14,11 +14,19 @@ except Exception:
 
 from vllm.inputs import TokensPrompt
 from vllm.outputs import RequestOutput
-from verl.workers.rollout.vllm_rollout.vllm_async_server import AsyncvLLMServerRegular
+
+try:
+    from verl.workers.rollout.vllm_rollout.vllm_async_server import AsyncvLLMServerRegular as _BaseAsyncvLLMServer
+except ImportError:
+    # verl <= 0.5.0 names this class AsyncvLLMServer and exposes it as a Ray
+    # actor class, which cannot be subclassed directly. Unwrap the plain class.
+    from verl.workers.rollout.vllm_rollout.vllm_async_server import AsyncvLLMServer as _AsyncvLLMServerActor
+
+    _BaseAsyncvLLMServer = getattr(_AsyncvLLMServerActor, "__ray_actor_class__", _AsyncvLLMServerActor)
 
 
 @ray.remote(num_cpus=1)
-class SkyAgentAsyncvLLMServer(AsyncvLLMServerRegular):
+class SkyAgentAsyncvLLMServer(_BaseAsyncvLLMServer):
     async def generate(
         self, prompt_ids: list[int], sampling_params: dict[str, Any], request_id: str
     ) -> Tuple[str, str]:

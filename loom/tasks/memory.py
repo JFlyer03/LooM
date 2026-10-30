@@ -74,14 +74,18 @@ class LongContextMemoryTask(BaseTask):
     @classmethod
     async def evaluate_result(cls, result, instance, options=None):
         options = options or {}
+        mode = options.get("reward_mode", "llm_judge")
+        if mode == "memagent":
+            from .verifiers.memagent import compute_score
+
+            return compute_score(result["answer"], instance["answers"])
+        if mode not in ("exact_match", "llm_judge"):
+            raise ValueError(f"Unsupported reward_mode: {mode}")
         prediction = extract_boxed_content(result["answer"])
         if prediction is None:
             return 0.0
-        mode = options.get("reward_mode", "llm_judge")
         if mode == "exact_match":
             return float(any(normalize_answer(prediction) == normalize_answer(a) for a in instance["answers"]))
-        if mode != "llm_judge":
-            raise ValueError(f"Unsupported reward_mode: {mode}")
         from openai import AsyncOpenAI
 
         # A judge failure must not silently become a valid negative training label.

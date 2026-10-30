@@ -1,0 +1,45 @@
+# Memory-R1 on the migrated loom memory modules.
+agent_cls: loom.agents.memory.MemoryR1Agent
+task: loom.tasks.memory_bank.MemoryBankTask
+tools: []
+
+data:
+  instance_key: instance
+  instance_id_key: __loom_uid
+  data_source_key: data_source
+
+memory:
+  extractor: naive_extractor
+  updater: naive_updater
+  # Choose [extraction] or [update]; native step-wise training supports one objective per run.
+  trainable_stages: [update]
+  max_generate_length: 2048
+
+generator:
+  infer_backend: skyrl-train
+  backend_config: null
+  num_trajectories: 8
+  max_iterations: 2
+  max_prompt_length: 3072
+  sampling_params:
+    temperature: 1.0
+    top_p: 1.0
+    max_tokens: ${memory.max_generate_length}
+  val_config:
+    num_trajectories: 1
+    sampling_params:
+      temperature: 0.0
+      top_p: 1.0
+      max_tokens: ${memory.max_generate_length}
+  remove_think_tokens: false
+  vision_is_active: false
+  qwen3_enable_thinking: false
+  qwen3_acc_thinking: false
+
+dispatcher:
+  type: async_batch
+  max_parallel_agents: 2
+  max_eval_parallel_agents: 2
+  val_config:
+    max_parallel_agents: 2
+    max_eval_parallel_agents: 2

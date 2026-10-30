@@ -9,11 +9,12 @@ from skyrl.train.entrypoints.main_base import BasePPOExp
 from skyrl.train.utils import initialize_ray, validate_cfg
 
 from .memory_generator import MemoryGenerator
+from .memory_config import DEFAULT_TASK, prepare_memory_config
 
 
 @dataclass
 class MemoryGeneratorConfig(GeneratorConfig):
-    task: str = "examples/memory/memagent.yaml"
+    task: str = DEFAULT_TASK
 
 
 MemoryTrainConfig = make_config(generator_cls=MemoryGeneratorConfig)
@@ -30,7 +31,7 @@ def run_experiment(cfg):
 
 
 def main():
-    cfg = MemoryTrainConfig.from_cli_overrides(sys.argv[1:])
+    cfg = MemoryTrainConfig.from_cli_overrides(prepare_memory_config(sys.argv[1:]))
     validate_cfg(cfg)
     initialize_ray(cfg)
     ray.get(run_experiment.remote(cfg))

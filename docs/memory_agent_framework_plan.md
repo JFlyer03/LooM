@@ -21,7 +21,7 @@ loom 的目标是提供一个面向记忆增强型 Agent 的模块化训练与�
 
 根据新的目录安排，以 `loom/` 为 loom 自己维护的运行包，Python 包名为 `loom`；原实现位于根目录 `loom_agent/`。根目录的 `skyrl-agent/` 保留为参考副本，不作为新的开发或安装入口。
 
-已新增独立文本记忆模块、固定编排 MemAgent、记忆任务与数据转换、采样轨迹适配和原生 SkyRL 训练入口。现有配置、Dispatcher、Transition 及后端适配优先复用，新的 MemAgent 路径不复制旧集成 Trainer 的完整训练循环。Memory-R1 和 RMM 尚未迁移。
+已新增独立文本记忆模块、固定编排 MemAgent、记忆任务与数据转换、采样轨迹适配和原生 SkyRL 训练入口。现有配置、Dispatcher、Transition 及后端适配优先复用，新的 MemAgent 路径不复制旧集成 Trainer 的完整训练循环。抽取、更新、检索、记忆库及 Memory-R1/RMM 编排现已迁入新源码，见 [模块迁移说明](memory_modules_migration.md)；独立阶段奖励的联合训练仍需后端适配。
 
 具体使用方式与验证边界见 [运行包说明](../loom/README.md)，来源见 [UPSTREAM.md](../loom/UPSTREAM.md)。下文保留设计目标；已有实现不代表所有阶段均已完成。
 
@@ -352,4 +352,4 @@ Memory-R1 用于验证：提取与更新阶段能否组合、单独开启训练�
 4. 至少 MemAgent、RMM、Memory-R1 的实际差异能够由组合配置和少量方法逻辑表达。
 5. 提供可复现运行入口，以及明确区分原方法复现与统一条件比较的实验记录。
 
-当前已完成 loom 命名空间迁移、首个 MemAgent 流程、数据转换与离线测试；Memory-R1/RMM 迁移、真实 GPU 后端兼容性、性能与完整训练结果仍需按阶段验证。
+当前已完成 loom 命名空间迁移、首个 MemAgent 流程、数据转换与离线测试；完整记忆模块体系及 Memory-R1/RMM 编排已接入源码；多目标联合训练适配、真实 GPU 后端兼容性、性能与完整训练结果仍需按阶段验证。

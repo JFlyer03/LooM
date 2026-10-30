@@ -77,7 +77,14 @@ The new memory-runtime implementation lives in `loom`, using the
 `loom` Python namespace. See its [setup and MemAgent guide](loom/README.md)
 and the [implementation plan](docs/memory_agent_framework_plan.md).
 The original implementation is preserved in `loom_agent`; the new path
-uses SkyRL's native trainer rather than the legacy loom trainer.
+uses reusable backend trainers rather than the legacy loom trainer.
+
+The new fixed-workflow MemAgent example is in
+[`examples/MemAgent`](examples/MemAgent/README.md), including its task YAML,
+SkyRL and VeRL launch scripts, data preparation instructions, and algorithm settings.
+The migrated memory-bank examples have matching launch configurations under
+[`examples/RMM`](examples/RMM/README.md) and
+[`examples/Memory-R1`](examples/Memory-R1/README.md).
 
 We provide reinforcement learning examples under `examples/`. Currently supported:
 
