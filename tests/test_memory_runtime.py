@@ -407,3 +407,44 @@ def test_python_entrypoint_rejects_invalid_sampling_counts(tmp_path):
     OmegaConf.save(task, path)
     with pytest.raises(ValueError, match="positive integers"):
         prepare_memory_config([f"generator.task={path}"])
+
+
+@pytest.mark.parametrize("backend_name", ["verl", "slime"])
+def test_native_memory_episode_preserves_reset_context_tokens_and_single_sampling(tmp_path, task_yaml, backend_name):
+    from loom.integrations.memory_episode import run_memory_episode
+
+    cfg = OmegaConf.load(task_yaml)
+    cfg.generator.infer_backend = backend_name
+    path = tmp_path / f"{backend_name}.yaml"
+    OmegaConf.save(cfg, path)
+    calls = []
+
+    class Server:
+        async def generate(self, *args, **kwargs):
+            ids = kwargs["prompt_ids"] if backend_name == "verl" else args[0]
+            prompt = Tokenizer().decode(ids)
+            calls.append(prompt)
+            text = "memory" if "<section>" in prompt else r"\boxed{France}"
+            tokens = Tokenizer().encode(text)
+            if backend_name == "verl":
+                return SimpleNamespace(token_ids=tokens, log_probs=[-.25] * len(tokens), stop_reason="completed")
+            return {"text": text, "meta_info": {"finish_reason": {"type": "stop"},
+                    "output_token_logprobs": [[-.25, token, None] for token in tokens]}}
+
+    output = asyncio.run(run_memory_episode(
+        path, Server(), Tokenizer(),
+        {"instance": {"context": "ABCDEF", "question": "Country?", "answers": ["France"]},
+         "__loom_uid": "native-session"},
+        {"temperature": .7},
+    ))
+    assert len(output["traj_rewards"]) == 1
+    assert output["traj_rewards"] == [1.]
+    assert len(calls) == len(output["response_ids"]) == 3
+    assert "ABC" in calls[0] and "DEF" not in calls[0]
+    assert "DEF" in calls[1] and "ABC" not in calls[1]
+    assert output["is_last_episode"] == [False, False, True]
+    for response, mask, logprobs in zip(output["response_ids"], output["loss_masks"], output["rollout_logprobs"]):
+        assert len(response) == len(mask) == len(logprobs)
+        assert logprobs == [-.25] * len(response)
+        assert all(mask)
+    assert OmegaConf.load(path).generator.num_trajectories == 2

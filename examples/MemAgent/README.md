@@ -4,7 +4,7 @@
 
 - [memagent.yaml](memagent.yaml)：Agent、记忆模块、任务、采样和并发配置。
 - [run_memagent.sh](run_memagent.sh)：SkyRL 原生 FSDP Trainer + vLLM 启动脚本。
-- [memagent_verl.yaml](memagent_verl.yaml) / [run_memagent_verl.sh](run_memagent_verl.sh)：VeRL FSDP + 同步 vLLM V0 的单卡入口。
+- [memagent_verl.yaml](memagent_verl.yaml) / [run_memagent_verl.sh](run_memagent_verl.sh)：VERL 原生 V1 + 异步 vLLM 入口，默认单卡。
 - [记忆模块](../../loom/modules/memory_agent.py)：从旧 `loom_agent/modules/memory_agent.py` 迁入新包的提示词、分块、记忆覆盖与循环。
 - [Agent](../../loom/agents/memory/agent.py)：调用推理后端并记录每次真实输入、生成 token 和采样概率。
 - [任务](../../loom/tasks/memory.py)：数据适配和最终答案评分。
@@ -70,50 +70,37 @@ bash examples/MemAgent/run_memagent.sh \
 
 默认关闭验证。启用时设置原生参数，例如 `"data.val_data=['/path/to/converted_dev.parquet']" trainer.eval_interval=5`。采样组大小、温度和 token 限制由 Python 入口从任务 YAML 自动映射到 SkyRL；修改这些共享参数时只需编辑 YAML，命令行与 YAML 冲突会在启动 Ray 前报错。其他训练参数仍由 bash 直接列出。
 
-## 使用 VeRL 后端
+## 使用 VERL / slime 后端
 
-VeRL 入口复用同一套 MemAgent、记忆模块、数据和 verifier。检查所用 VeRL/vLLM 的版本组合后，在独立环境中安装 LooM：
+三个后端分别使用 `loom-verl`、`loom-slime`、`loom-skyrl` 环境，
+安装边界与验证状态见[后端环境说明](../../requirements/README.md)。
 
-```bash
-conda activate loom-verl
-cd /public/home/jiangfeibing/projects/LooM
-python -m pip install -e '.[data]'
-```
-
-本次检查的环境为 Python 3.12、VeRL 0.5.0、vLLM 0.8.5、PyTorch 2.6.0+cu124。默认脚本使用同步 V0：`VLLM_USE_V1=0`、XFormers 推理注意力和 FP16 rollout。在原生 `ActorRolloutRefWorker` 中增加 [V0 MemAgent rollout](../../loom/integrations/verl/memory_v0.py)，记忆循环在 VeRL 原有的权重同步、offload 和 sleep/wake 上下文内执行；不修改已安装的 VeRL 源码。初版只支持**单卡、FSDP、TP=1、全参数训练**，其他组合会在启动 Ray 前报错。异步 V1 路径仍要求算力至少 8.0，不能用于当前 V100。
-
-训练和参考模型参数、FSDP mixed-precision 参数均设为 FP32，模型注意力使用 SDPA，rollout 使用 FP16。VeRL 0.5 的原生 actor 前向内部仍固定使用 BF16 autocast；当前 PyTorch/V100 组合可软件模拟，已通过小矩阵前向和反向的有限值检查，但没有 BF16 硬件加速，也没有验证完整模型训练的吞吐和显存。此处不声称与 A100 上的 BF16 训练等价。
-
-脚本使用 `datas/memory/memagent_train_verl.parquet`。本机原有训练 Parquet 由较新 PyArrow 导出，PyArrow 19 读取时出现 `Repetition level histogram size mismatch`，因此从同一 JSON 在 `loom-verl` 环境重新导出一份，保留全部 1990 条和原文件。VeRL 0.5 的原生 Trainer 要求验证 DataLoader 非空，因此另用作者 dev 数据的 128 条验证记录。若对应输出不存在，再执行转换：
-
-```bash
-python -m loom.tasks.prepare_memory_data \
-  --input datas/converted_hotpotqa_2000.json \
-  --output datas/memory/memagent_train_verl.parquet
-
-python -m loom.tasks.prepare_memory_data \
-  --input MemAgent/hotpotqa/hotpotqa_dev.parquet \
-  --output datas/memory/memagent_dev.parquet
-```
-
-先检查最终配置；这个命令不启动 Ray、不加载 GPU 模型：
+VERL 入口使用原生 V1/TransferQueue 训练器和多输出 AgentLoop。每次记忆更新、最终
+回答都是独立的 `(prompt, response)`，原生 GRPO 对每条会话终局计算一次优势，再广播
+给该会话的所有步骤。默认脚本面向 H100，使用异步 vLLM V1、BF16 和 SDPA：
 
 ```bash
 bash examples/MemAgent/run_memagent_verl.sh --cfg job --resolve
+CUDA_VISIBLE_DEVICES=0 bash examples/MemAgent/run_memagent_verl.sh trainer.total_training_steps=1
 ```
 
-脚本已设置本机缓存的 Qwen3-1.7B 路径。选择空闲 GPU，先限制为 1 次训练迭代：
+先修改脚本顶部的模型、训练/验证 Parquet 和输出目录。也可追加原生 VERL 参数覆盖
+路径，例如 `"data.train_files=['/path/to/train.parquet']"`。完整训练尚需 GPU 验证。
+
+slime 接入使用原生 custom-generate hook；一条轨迹返回多个共享 `rollout_id` 的原生
+`Sample`，保持每步上下文独立。原生 BatchBuilder 按完整轨迹归一化终局奖励，模型更新
+和权重同步也由原生训练器执行。先将任务 Parquet 转为带完整 metadata 的 JSONL：
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash examples/MemAgent/run_memagent_verl.sh \
-  trainer.total_training_steps=1
+python -m loom.integrations.slime.prepare_data \
+  --input /path/to/train.parquet --output /path/to/train_slime.jsonl
+python -m loom.integrations.slime.memory_main --print-args
 ```
 
-移除 `trainer.total_training_steps=1` 后默认训练 2 个 epoch。脚本顶部设置模型、训练文件、验证文件和输出目录，GPU 数保留为 1；也可在末尾追加原生 VeRL 参数，如 `actor_rollout_ref.actor.optim.lr=2e-6`。默认 Qwen3-1.7B、16 条训练轨迹、4 条验证轨迹，每 10 步验证和保存，关闭训练前验证。V0 engine 在 worker 线程内串行处理模型调用，YAML 的并发数不代表同一引擎并行生成。未启用旧框架的本地 Trainer。
-
-共享的采样数、温度和输入输出预算由 Python 入口从 `memagent_verl.yaml` 映射到 VeRL；与显式命令行参数冲突会报错。`skyrl_agent.*` 是沿用现有 VeRL 集成的配置键，不会调用 SkyRL 的训练后端。
-
-训练时每次记忆更新和回答仍是独立 `(prompt, response)` 行。适配器按实际步骤数展开输入元数据，使用 VeRL 原生 GRPO 只对每条轨迹的终局计算一次优势，再广播给该轨迹全部步骤，避免长轨迹在组内均值中被重复计数。验证只返回每条完整轨迹的最终答案行。PPO loss、旧策略概率重算、优化器、反向传播和权重同步由 VeRL 负责。
+使用 `loom.integrations.slime.memory_main` 并追加原生 slime/Megatron 模型、checkpoint、
+数据和并行参数启动训练。包装入口调用固定源码中的原生 `train.py`；HF checkpoint 到
+Megatron 格式的转换需要按模型完成。H100 / Qwen3-0.6B 的启动脚本已通过连续两轮训练、
+权重同步、保存与评估。完整安装、模型转换和启动命令见 [slime 后端说明](../../requirements/slime.md)。
 
 ## 算法设置
 

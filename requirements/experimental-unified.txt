@@ -1,0 +1,50 @@
+# Experimental only: not a validated training environment. Do not use for normal installation.
+# Unified Python 3.12 / Linux x86_64 / H100 runtime candidate.
+# Bootstrap pinned sources and local compatibility wheels before installing:
+#   python scripts/prepare_unified_sources.py
+#   python scripts/build_unified_wheels.py
+# See requirements/README.md. +loom1 packages contain documented integration
+# patches; upstream does not certify this combined runtime. Keep the previous
+# environment until package checks and native GPU validation have passed.
+--find-links ${HOME}/.cache/loom-unified/wheels
+-r common.txt
+-r storage.txt
+# Direct official wheels keep the CUDA build fixed without querying GPU indexes
+# for every unrelated Python dependency. SHA256 values are from the official index.
+torch @ https://download-r2.pytorch.org/whl/cu130/torch-2.13.0%2Bcu130-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=8db7338e6895c3d4bd89a02ff4209507d1f0cf2ffeb3b898538b5a07d1ea8c1e
+torchvision @ https://download-r2.pytorch.org/whl/cu130/torchvision-0.28.0%2Bcu130-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=8a0008d34ccc4e81066b97ff0ae5a34c676bfdf3464baf40c01b320dc9a45ce0
+torchaudio @ https://download-r2.pytorch.org/whl/cu130/torchaudio-2.11.0%2Bcu130-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=3fba988f4301fe13547fe5e99c76d9ae36a27e19ded82eeffed9d2456e12edef
+torchcodec @ https://download.pytorch.org/whl/cu130/torchcodec-0.15.0%2Bcu130-cp312-cp312-manylinux_2_28_x86_64.whl#sha256=54e9c069270f7cbe84123d53b87678acd834a62f14acaa45bf8558cd21669bb0
+vllm==0.29.0+loom1
+skyrl[fsdp]==0.4.0+loom1
+sglang==0.5.21+loom1
+transformers==5.12.1
+openai==2.54.0
+peft==0.18.1
+ray[default]==2.57.0
+vllm-router==0.1.17
+nvidia-resiliency-ext==0.7.0
+numpy==2.3.5
+scipy==1.18.1
+tensordict==0.10.0
+flashinfer-python==0.6.18
+flashinfer-cubin @ file://${HOME}/.cache/loom-unified/wheels/flashinfer_cubin-0.6.18-py3-none-any.whl
+flashinfer-jit-cache @ file://${HOME}/.cache/loom-unified/wheels/flashinfer_jit_cache-0.6.18+cu130-cp39-abi3-manylinux_2_28_x86_64.whl
+flash-attn==2.8.3+loom1
+flash-attn-4==4.0.0b18
+flash-linear-attention==0.5.2
+nixl==1.5.0
+cupy-cuda13x==14.0.1
+# Keep JIT compilers on CUDA 13.0, matching Torch and the H100 driver.
+nvidia-cuda-nvcc==13.0.88
+nvidia-cuda-crt==13.0.88
+nvidia-nvvm==13.0.88
+transformer-engine[pytorch,core_cu13]==2.19.0
+apex @ file://${HOME}/.cache/loom-unified/wheels/apex-0.1-cp312-cp312-linux_x86_64.whl
+transformer-engine-torch @ file://${HOME}/.cache/loom-unified/wheels/transformer_engine_torch-2.19.0-cp312-cp312-linux_x86_64.whl
+causal-conv1d @ file://${HOME}/.cache/loom-unified/wheels/causal_conv1d-1.6.2.post1-cp312-cp312-linux_x86_64.whl
+sglang-router @ file://${HOME}/.cache/loom-unified/wheels/sglang_router-0.3.2-cp38-abi3-manylinux_2_28_x86_64.whl
+-e .backend-src/verl[verl-core]
+-e .backend-src/slime
+-e .backend-src/megatron
+-e .[data,test]

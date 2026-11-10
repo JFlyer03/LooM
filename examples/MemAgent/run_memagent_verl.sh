@@ -3,17 +3,17 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 export PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}"
-export VLLM_USE_V1=0
-export VLLM_ATTENTION_BACKEND=XFORMERS
+export VLLM_USE_V1=1
 
-MODEL_PATH="/public/home/jiangfeibing/.cache/modelscope/models/Qwen--Qwen3-1.7B/snapshots/master"
-DATA_PATH="./datas/memory/memagent_train_verl.parquet"
-VAL_DATA_PATH="./datas/memory/memagent_dev.parquet"
-OUTPUT_DIR="./output/MemAgent-verl"
-NUM_GPUS=1
+MODEL_PATH="${MODEL_PATH:-Qwen/Qwen3-1.7B}"
+DATA_PATH="${DATA_PATH:-./datas/memory/memagent_train_verl.parquet}"
+VAL_DATA_PATH="${VAL_DATA_PATH:-./datas/memory/memagent_dev.parquet}"
+OUTPUT_DIR="${OUTPUT_DIR:-./output/MemAgent-verl}"
+NUM_GPUS="${NUM_GPUS:-1}"
+TASK_YAML="${TASK_YAML:-examples/MemAgent/memagent_verl.yaml}"
 
 exec python -m loom.integrations.verl.memory_main \
-    +skyrl_agent.task_yaml=examples/MemAgent/memagent_verl.yaml \
+    "+skyrl_agent.task_yaml=$TASK_YAML" \
     "actor_rollout_ref.model.path=$MODEL_PATH" \
     "data.train_files=['$DATA_PATH']" \
     "data.val_files=['$VAL_DATA_PATH']" \
@@ -36,18 +36,15 @@ exec python -m loom.integrations.verl.memory_main \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.use_torch_compile=false \
     actor_rollout_ref.actor.entropy_from_logits_with_chunking=true \
-    +actor_rollout_ref.actor.fsdp_config.model_dtype=fp32 \
-    +actor_rollout_ref.actor.fsdp_config.mixed_precision.param_dtype=fp32 \
-    +actor_rollout_ref.actor.fsdp_config.mixed_precision.reduce_dtype=fp32 \
-    +actor_rollout_ref.actor.fsdp_config.mixed_precision.buffer_dtype=fp32 \
+    actor_rollout_ref.actor.fsdp_config.model_dtype=bf16 \
     actor_rollout_ref.actor.fsdp_config.param_offload=true \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
     actor_rollout_ref.model.use_remove_padding=false \
     actor_rollout_ref.model.enable_gradient_checkpointing=true \
     +actor_rollout_ref.model.override_config._attn_implementation=sdpa \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.mode=sync \
-    actor_rollout_ref.rollout.dtype=float16 \
+    actor_rollout_ref.rollout.mode=async \
+    actor_rollout_ref.rollout.dtype=bfloat16 \
     actor_rollout_ref.rollout.enable_chunked_prefill=false \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
@@ -56,10 +53,7 @@ exec python -m loom.integrations.verl.memory_main \
     actor_rollout_ref.rollout.agent.num_workers=1 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=true \
-    +actor_rollout_ref.ref.fsdp_config.model_dtype=fp32 \
-    +actor_rollout_ref.ref.fsdp_config.mixed_precision.param_dtype=fp32 \
-    +actor_rollout_ref.ref.fsdp_config.mixed_precision.reduce_dtype=fp32 \
-    +actor_rollout_ref.ref.fsdp_config.mixed_precision.buffer_dtype=fp32 \
+    actor_rollout_ref.ref.fsdp_config.model_dtype=bf16 \
     algorithm.adv_estimator=grpo \
     algorithm.norm_adv_by_std_in_grpo=false \
     algorithm.use_kl_in_reward=false \

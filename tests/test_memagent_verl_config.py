@@ -5,9 +5,11 @@ import subprocess
 import sys
 
 import pytest
+import torch
 from omegaconf import OmegaConf
 
 from loom.integrations.verl.memory_config import prepare_memory_overrides
+from loom.integrations.verl.memory_adapter import validate_memory_training
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,10 +51,12 @@ def test_verl_launcher_forwards_paths_and_maps_task_settings(tmp_path):
     assert cfg.actor_rollout_ref.rollout.n == cfg.skyrl_agent.num_trajectories == 16
     assert cfg.actor_rollout_ref.rollout.val_kwargs.n == 4
     assert cfg.actor_rollout_ref.rollout.max_model_len == 8192
-    assert cfg.actor_rollout_ref.rollout.mode == "sync"
-    assert cfg.actor_rollout_ref.rollout.dtype == "float16"
-    assert cfg.actor_rollout_ref.rollout.memory_task_yaml.endswith("memagent_verl.yaml")
-    assert cfg.actor_rollout_ref.actor.fsdp_config.mixed_precision.param_dtype == "fp32"
+    assert cfg.actor_rollout_ref.rollout.mode == "async"
+    assert cfg.actor_rollout_ref.rollout.dtype == "bfloat16"
+    assert cfg.actor_rollout_ref.actor.fsdp_config.model_dtype == "bf16"
+    assert cfg.trainer.use_v1 is True
+    assert cfg.trainer.v1.trainer_mode == "sync"
+    assert cfg.actor_rollout_ref.rollout.agent.default_agent_loop == "loom_memory"
     assert cfg.data.train_files != cfg.data.val_files
 
 
@@ -79,3 +83,32 @@ def test_verl_task_is_source_for_sampling_and_budgets(tmp_path):
 def test_verl_entrypoint_rejects_skyrl_task():
     with pytest.raises(ValueError, match="infer_backend: verl"):
         prepare_memory_overrides([f"+skyrl_agent.task_yaml={ROOT / 'examples/MemAgent/memagent.yaml'}"])
+
+
+def test_verl_entrypoint_rejects_synchronous_rollout():
+    with pytest.raises(ValueError, match="rollout.mode must match"):
+        prepare_memory_overrides(["actor_rollout_ref.rollout.mode=sync"])
+
+def test_memory_launch_rejects_v100_before_starting_ray(monkeypatch):
+    config = OmegaConf.create({
+        "skyrl_agent": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
+        "algorithm": {"adv_estimator": "grpo", "use_kl_in_reward": False},
+        "actor_rollout_ref": {"rollout": {"name": "vllm", "mode": "async"}},
+    })
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda i: (7, 0))
+    with pytest.raises(RuntimeError, match="compute capability >= 8.0"):
+        validate_memory_training(config)
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda i: (9, 0))
+    validate_memory_training(config)
+
+
+
+def test_memory_launch_rejects_synchronous_rollout():
+    config = OmegaConf.create({
+        "skyrl_agent": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
+        "algorithm": {"adv_estimator": "grpo", "use_kl_in_reward": False},
+        "actor_rollout_ref": {"rollout": {"name": "vllm", "mode": "sync"}},
+    })
+    with pytest.raises(ValueError, match="mode=async"):
+        validate_memory_training(config)

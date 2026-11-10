@@ -24,6 +24,16 @@ def prepare_memory_overrides(args):
     )) or gen.num_trajectories < 2:
         raise ValueError("Token limits must be positive integers and GRPO needs at least two trajectories")
     shared = {
+        "actor_rollout_ref.rollout.mode": "async",
+        "trainer.use_v1": True,
+        "trainer.v1.trainer_mode": "sync",
+        "algorithm.adv_estimator": "grpo",
+        "algorithm.use_kl_in_reward": False,
+        "algorithm.norm_adv_by_std_in_grpo": False,
+        "actor_rollout_ref.rollout.agent.default_agent_loop": "loom_memory",
+        "actor_rollout_ref.rollout.agent.agent_loop_config_path": str(Path(__file__).with_name("memory_agent_loop.yaml")),
+        "data.custom_cls.path": str(Path(__file__).with_name("memory_dataset.py")),
+        "data.custom_cls.name": "MemoryDataset",
         "skyrl_agent.task_yaml": str(task_path),
         "skyrl_agent.num_trajectories": gen.num_trajectories,
         "data.max_prompt_length": gen.max_prompt_length,
@@ -39,13 +49,11 @@ def prepare_memory_overrides(args):
         "actor_rollout_ref.rollout.val_kwargs.top_p": gen.val_config.sampling_params.top_p,
         "actor_rollout_ref.rollout.val_kwargs.do_sample": gen.val_config.sampling_params.temperature > 0,
     }
-    if OmegaConf.select(overrides, "actor_rollout_ref.rollout.mode") == "sync":
-        shared["actor_rollout_ref.rollout.memory_task_yaml"] = str(task_path)
     additions = []
     for key, value in shared.items():
         if OmegaConf.select(overrides, key, default=value) != value:
             raise ValueError(f"{key} must match {task_path} ({value!r}); change the task YAML instead")
         if OmegaConf.select(overrides, key) is None:
-            prefix = "+" if key.startswith("skyrl_agent.") or key.endswith(".memory_task_yaml") else ""
+            prefix = "+" if key.startswith("skyrl_agent.") else ""
             additions.append(f"{prefix}{key}={json.dumps(value)}")
     return [*additions, *args]

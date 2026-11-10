@@ -55,7 +55,7 @@ loom是一个模块化的记忆处理框架，集成了完整的记忆生命周�
 ### 1. 安装和环境配置
 
 **📌 环境与硬件要求：**
-* **Python**：推荐 3.10
+* **Python**：`loom` 运行时和训练后端使用 3.12
 * **GPU**：推荐使用一块 A800 80G 或更好的 GPU
 
 ```bash
@@ -64,7 +64,11 @@ git clone git@github.com:MemTensor/loom.git
 cd loom
 
 # 安装依赖
-pip install -r requirements.txt
+conda create -n loom-verl python=3.12 pip -y
+conda activate loom-verl
+python -m pip install uv packaging
+# Install the selected native backend first; see requirements/README.md
+python -m pip install -r requirements.txt -e '.[data,test]'
 
 # 配置环境变量
 cp .env.example .env
@@ -72,6 +76,9 @@ cp .env.example .env
 
 # 获取训练数据（可选）
 ```
+
+`requirements.txt` 只包含公共应用依赖。VERL、slime、SkyRL 分别使用独立的 Python 3.12
+conda 环境，安装边界与验证状态见[后端环境说明](requirements/README.md)。
 
 ### 2. 启动强化学习训练
 我们在 examples/ 目录下提供了强化学习示例。目前支持：

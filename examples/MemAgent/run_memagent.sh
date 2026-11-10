@@ -4,16 +4,17 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 export PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}"
 
-MODEL_PATH="Qwen/Qwen2.5-7B-Instruct"
-DATA_PATH="./datas/memory/memagent_train.parquet"
-OUTPUT_DIR="./output/MemAgent"
-NUM_GPUS=1
+MODEL_PATH="${MODEL_PATH:-Qwen/Qwen2.5-7B-Instruct}"
+DATA_PATH="${DATA_PATH:-./datas/memory/memagent_train.parquet}"
+OUTPUT_DIR="${OUTPUT_DIR:-./output/MemAgent}"
+NUM_GPUS="${NUM_GPUS:-1}"
+TASK_YAML="${TASK_YAML:-examples/MemAgent/memagent.yaml}"
 
 exec python -m loom.integrations.skyrl_train.memory_main \
     "trainer.policy.model.path=$MODEL_PATH" \
     "data.train_data=['$DATA_PATH']" \
     data.val_data=[] \
-    generator.task=examples/MemAgent/memagent.yaml \
+    "generator.task=$TASK_YAML" \
     trainer.strategy=fsdp \
     trainer.placement.colocate_all=true \
     "trainer.placement.policy_num_gpus_per_node=$NUM_GPUS" \

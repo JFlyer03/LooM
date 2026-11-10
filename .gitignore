@@ -1,4 +1,4 @@
-slime/
+/slime/
 /MemAgent/
 SkyRL/
 skyrl-agent/
@@ -234,3 +234,8 @@ evaluation/data/temporal_locomo
 !assets/loom.pdf
 !requirements.txt
 !requirements-full.txt
+!requirements/*.txt
+
+# Pinned external sources and generated wheels for the unified runtime.
+/.backend-src/
+/.backend-wheels/

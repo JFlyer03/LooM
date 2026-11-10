@@ -23,7 +23,7 @@ include = ["loom", "loom.*"]
 namespaces = true
 
 [tool.setuptools.package-data]
-"loom" = ["functional/templates/*.jinja2", "tasks/swebench/scripts/**/*.sh", "tasks/swebench/scripts/**/*.py", "LICENSE", "UPSTREAM.md"]
+"loom" = ["functional/templates/*.jinja2", "integrations/verl/*.yaml", "tasks/swebench/scripts/**/*.sh", "tasks/swebench/scripts/**/*.py", "LICENSE", "UPSTREAM.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

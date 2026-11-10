@@ -1,0 +1,22 @@
+# Shared application dependencies; each backend owns its GPU runtime.
+# Agent configuration, model calls and function calling
+omegaconf>=2.3,<3
+loguru>=0.7,<1
+aiohttp>=3.10,<4
+litellm>=1.63,<2
+swanlab>=0.7.6,<1
+
+# Data processing
+numpy>=1.26,<3
+pandas>=2.2,<4
+pyarrow>=19
+datasets>=3.6,<6
+tqdm>=4.67,<5
+
+# Service and storage clients
+openai>=2.6.1,<3
+python-dotenv>=1.2.1,<2
+
+# Common model runtime helpers
+sentencepiece>=0.2.1,<1
+safetensors>=0.6.2,<1

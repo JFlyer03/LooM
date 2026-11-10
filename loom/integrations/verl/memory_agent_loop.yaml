@@ -1,0 +1,2 @@
+- name: loom_memory
+  _target_: loom.integrations.verl.memory_agent_loop.MemoryAgentLoop

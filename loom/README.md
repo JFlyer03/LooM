@@ -14,11 +14,11 @@
 - `integrations/skyrl_train/memory_generator.py`：连接原生 SkyRL 的采样 ID 与 step-wise 输出，不重复展开采样组。
 - `integrations/skyrl_train/memory_main.py`：复用 SkyRL 原生 Trainer 的新入口，不使用旧的 `SkyRLAgentPPOTrainer` 训练循环。
 
-抽取、更新、检索、记忆库以及 Memory-R1 / RMM 的组合编排也已迁入新包，详见[源码迁移与接口说明](../docs/memory_modules_migration.md)。Memory-R1 的双阶段独立优势联合训练需要额外后端适配；当前 SkyRL 入口要求每次选择一个训练阶段。旧 SWE、ReAct、VERL、Tinker 集成已保留并修改命名空间，但没有验证其完整训练。
+抽取、更新、检索、记忆库以及 Memory-R1 / RMM 的组合编排也已迁入新包，详见[源码迁移与接口说明](../docs/memory_modules_migration.md)。Memory-R1 的双阶段独立优势联合训练需要额外后端适配；当前 SkyRL 入口要求每次选择一个训练阶段。VERL 入口使用原生 V1 AgentLoop，slime 使用原生 custom-generate hook；SWE、ReAct、Tinker 集成保留，但没有验证其完整训练。
 
 ## 安装边界
 
-从 **LooM 项目根目录**运行。使用独立 Python 3.12 环境，不在原 Python 3.10 `loom` 环境中安装新的训练栈。
+从 **LooM 项目根目录**运行。三个后端分别使用独立的 Python 3.12 conda 环境。
 
 仅安装记忆流程和测试依赖：
 
@@ -27,14 +27,12 @@ python -m pip install -e '.[test,data]'
 python -m pytest tests -q
 ```
 
-安装训练后端时，按所选 SkyRL commit 的文档安装该版本及其匹配的 PyTorch/vLLM/CUDA 依赖，再将本项目安装到同一个环境。若明确使用根目录的本地 SkyRL checkout，可将其作为本地源码安装：
+根目录 `requirements.txt` 仅包含公共应用依赖，原生 GPU 运行栈按后端分别安装，
+安装边界与验证状态见[后端环境说明](../requirements/README.md)。
+VERL 记忆入口使用原生 V1 多输出 AgentLoop；slime 通过原生 custom-generate hook
+执行记忆轨迹并保留每个独立上下文。两者都由后端负责 GRPO、模型更新与权重同步。
 
-```bash
-python -m pip install -e './SkyRL[fsdp]'
-python -m pip install -e '.[data]'
-```
-
-这些命令不代表当前 GPU 已满足所选 vLLM 和注意力内核要求。完整 GPU 训练尚未执行，不将通过无 GPU 测试视为后端运行兼容性证明。
+slime 的 H100 单卡 MemAgent 训练、权重同步、保存和评估已通过，详见 [slime 安装与验证](../requirements/slime.md)。其他后端仍需分别完成 GPU 训练验证。
 
 不要使用 `skyrl-agent/pyproject.toml` 安装本包：它安装的是另一个保留的原始副本。这里使用根目录的新 `pyproject.toml`。
 
@@ -54,7 +52,7 @@ python -m loom.tasks.prepare_memory_data \
 
 ## 配置与启动
 
-SkyRL 入口配置：[examples/MemAgent/memagent.yaml](../examples/MemAgent/memagent.yaml)。VeRL 对应入口为 [run_memagent_verl.sh](../examples/MemAgent/run_memagent_verl.sh)，使用 [memagent_verl.yaml](../examples/MemAgent/memagent_verl.yaml)，为 V100 提供单卡 FSDP + V0 rollout 适配。完整 GPU 训练尚未验证；具体版本和精度限制见 [MemAgent 示例](../examples/MemAgent/README.md)。
+SkyRL 入口配置：[examples/MemAgent/memagent.yaml](../examples/MemAgent/memagent.yaml)。VeRL 对应入口为 [run_memagent_verl.sh](../examples/MemAgent/run_memagent_verl.sh)，使用 [memagent_verl.yaml](../examples/MemAgent/memagent_verl.yaml)，默认使用面向 H100 的单卡 FSDP + 异步 vLLM V1 rollout。完整 GPU 训练尚未验证；具体版本和精度限制见 [MemAgent 示例](../examples/MemAgent/README.md)。
 
 记忆库算法的对应配置和简洁启动脚本在 [RMM](../examples/RMM/README.md) 与 [Memory-R1](../examples/Memory-R1/README.md)。RMM 默认只训练重排，Memory-R1 默认训练更新阶段。
 

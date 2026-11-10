@@ -53,7 +53,7 @@ From modules to agents to environments, the framework offers substantial flexibi
 ### 1. Installation and Environment Setup
 
 **📌 Environment and Hardware Requirements:**
-* **Python**: 3.10 recommended
+* **Python**: 3.12 for the `loom` runtime and training backends
 * **GPU**: An A800 80G or better is recommended
 
 ```bash
@@ -62,7 +62,11 @@ git clone git@github.com:MemTensor/loom.git
 cd loom
 
 # Install dependencies
-pip install -r requirements.txt
+conda create -n loom-verl python=3.12 pip -y
+conda activate loom-verl
+python -m pip install uv packaging
+# Install the selected native backend first; see requirements/README.md
+python -m pip install -r requirements.txt -e '.[data,test]'
 
 # Configure environment variables
 cp .env.example .env
@@ -70,6 +74,9 @@ cp .env.example .env
 
 # Download training data (optional)
 ```
+
+`requirements.txt` contains shared application dependencies. Use separate Python 3.12
+conda environments for VERL, slime and SkyRL; see the [backend environment guide](requirements/README.md).
 
 ### 2. Launch RL Training
 

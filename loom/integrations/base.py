@@ -39,7 +39,7 @@ class BackendSpec:
 
 def _get_backend_spec(name: str):
     if name not in BACKEND_REGISTRY:
-        module = {"skyrl-train": "skyrl_train", "verl": "verl", "tinker": "tinker", "openai_server": "openai"}.get(name)
+        module = {"skyrl-train": "skyrl_train", "verl": "verl", "slime": "slime", "tinker": "tinker", "openai_server": "openai"}.get(name)
         if module is not None:
             importlib.import_module(f"{__package__}.{module}")
     if name not in BACKEND_REGISTRY:

@@ -61,7 +61,6 @@ class RuntimeConfig:
         )
 
 
-@dataclass
 class TrajectoryResult(TypedDict):
     instance_id: str
     trajectory_id: str

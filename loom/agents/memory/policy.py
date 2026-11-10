@@ -35,7 +35,7 @@ class MemoryPolicyAgent:
     async def _generate(self, prompt, stage):
         messages = [{"role": "user", "content": prompt}]
         input_ids = self.tokenizer.apply_chat_template(
-            messages, tokenize=True, add_generation_prompt=True,
+            messages, tokenize=True, return_dict=False, add_generation_prompt=True,
             enable_thinking=self.cfg.qwen3_enable_thinking,
         )
         if len(input_ids) > self.cfg.max_prompt_length:

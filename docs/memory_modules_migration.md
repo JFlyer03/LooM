@@ -78,8 +78,14 @@ RMM 可选择 `--task rerank_bank`。长文本 QA 仍使用默认的 `--task lon
 
 完整的 MemAgent 训练 YAML 和启动脚本在 [examples/MemAgent](../examples/MemAgent/README.md)。旧五个训练脚本继续保留原有实验入口；新入口使用上述模块体系，不调用旧 Trainer。
 
-MemAgent 同时提供 `run_memagent_verl.sh` / `memagent_verl.yaml`。VeRL 适配保留独立的记忆上下文行，按真实步骤数对齐 DataProto，只把每条轨迹的终局交给原生 GRPO，再将优势广播到步骤；验证仅保留最终答案。默认使用 `memory_v0.py` 的单卡 FSDP 同步 V0 适配，记忆循环在原生 worker 的权重同步上下文内执行，复用原生 sharding manager；当前限制 TP=1、全参数训练。`rollout_data.py` 为 V0 和异步路径共享张量打包；异步 V1 仍要求算力至少 8.0。完整 GPU 训练尚未验证。
+MemAgent 的 VERL 入口已升级到原生 V1/TransferQueue AgentLoop，每个重置上下文返回一个
+`AgentLoopOutput`，由原生多输出 GRPO 只对会话终局计算优势，再广播给同一会话的步骤。
+旧 V0 rollout、自建异步服务器和复制的 PPO Trainer 已移除。slime 通过
+`loom.integrations.slime.memory_rollout.generate` 返回共享 `rollout_id` 的多个原生 `Sample`，
+复用原生轨迹分组、奖励归一化、模型更新和权重同步。统一运行栈的依赖、补丁及验证状态见
+[安装说明](../requirements/README.md)。slime 的 H100 单卡 MemAgent 训练、权重同步、
+保存与恢复已通过，详见 [slime 验证说明](../requirements/slime.md)。
 
 对应的记忆库启动配置在 [examples/RMM](../examples/RMM/README.md) 和 [examples/Memory-R1](../examples/Memory-R1/README.md)，分别选择重排目标和更新目标；Memory-R1 可在 YAML 中切换为抽取目标。
 
-离线测试覆盖全部迁移模块的提示词、注册、临时 ID、存储操作与隔离、MemAgent 循环、Memory-R1 阶段奖励及 mask、RMM 固定准备与重排分工。测试使用受控推理和裁判；完整 GPU 训练、真实数据库和外部模型效果尚未验证。
+离线测试覆盖全部迁移模块的提示词、注册、临时 ID、存储操作与隔离、MemAgent 循环、Memory-R1 阶段奖励及 mask、RMM 固定准备与重排分工。测试使用受控推理和裁判；另已通过 slime 的 H100 单卡 MemAgent 训练验证。其他 GPU 组合、真实数据库和外部模型效果尚未验证。
