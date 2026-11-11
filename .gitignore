@@ -239,3 +239,4 @@ evaluation/data/temporal_locomo
 # Pinned external sources and generated wheels for the unified runtime.
 /.backend-src/
 /.backend-wheels/
+/tensorboard_log/

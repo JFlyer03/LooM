@@ -3,12 +3,12 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 export PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}"
-export VLLM_USE_V1=1
 
 MODEL_PATH="${MODEL_PATH:-Qwen/Qwen3-1.7B}"
 DATA_PATH="${DATA_PATH:-./datas/memory/memagent_train_verl.parquet}"
 VAL_DATA_PATH="${VAL_DATA_PATH:-./datas/memory/memagent_dev.parquet}"
 OUTPUT_DIR="${OUTPUT_DIR:-./output/MemAgent-verl}"
+export TENSORBOARD_DIR="${TENSORBOARD_DIR:-$OUTPUT_DIR/tensorboard}"
 NUM_GPUS="${NUM_GPUS:-1}"
 TASK_YAML="${TASK_YAML:-examples/MemAgent/memagent_verl.yaml}"
 
@@ -18,7 +18,7 @@ exec python -m loom.integrations.verl.memory_main \
     "data.train_files=['$DATA_PATH']" \
     "data.val_files=['$VAL_DATA_PATH']" \
     data.train_batch_size=1 \
-    data.val_batch_size=1 \
+    data.val_batch_size=128 \
     data.dataloader_num_workers=0 \
     data.return_raw_chat=true \
     data.filter_overlong_prompts=false \
@@ -36,7 +36,7 @@ exec python -m loom.integrations.verl.memory_main \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.use_torch_compile=false \
     actor_rollout_ref.actor.entropy_from_logits_with_chunking=true \
-    actor_rollout_ref.actor.fsdp_config.model_dtype=bf16 \
+    actor_rollout_ref.actor.fsdp_config.model_dtype=fp32 \
     actor_rollout_ref.actor.fsdp_config.param_offload=true \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
     actor_rollout_ref.model.use_remove_padding=false \
@@ -45,8 +45,9 @@ exec python -m loom.integrations.verl.memory_main \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.mode=async \
     actor_rollout_ref.rollout.dtype=bfloat16 \
-    actor_rollout_ref.rollout.enable_chunked_prefill=false \
+    actor_rollout_ref.rollout.enable_chunked_prefill=true \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.max_num_seqs=48 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
     actor_rollout_ref.rollout.enforce_eager=true \
@@ -62,7 +63,10 @@ exec python -m loom.integrations.verl.memory_main \
     trainer.project_name=loom \
     trainer.experiment_name=memagent-verl \
     'trainer.logger=[console]' \
-    trainer.val_before_train=false \
+    trainer.val_before_train=true \
+    trainer.log_val_generations=4 \
+    "trainer.validation_data_dir=$OUTPUT_DIR/validation" \
+    "trainer.rollout_data_dir=$OUTPUT_DIR/rollouts" \
     trainer.test_freq=10 \
     trainer.save_freq=10 \
     trainer.total_epochs=2 \

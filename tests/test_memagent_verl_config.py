@@ -51,9 +51,11 @@ def test_verl_launcher_forwards_paths_and_maps_task_settings(tmp_path):
     assert cfg.actor_rollout_ref.rollout.n == cfg.skyrl_agent.num_trajectories == 16
     assert cfg.actor_rollout_ref.rollout.val_kwargs.n == 4
     assert cfg.actor_rollout_ref.rollout.max_model_len == 8192
+    assert cfg.actor_rollout_ref.rollout.max_num_seqs == 48
+    assert cfg.data.val_batch_size == 128
     assert cfg.actor_rollout_ref.rollout.mode == "async"
     assert cfg.actor_rollout_ref.rollout.dtype == "bfloat16"
-    assert cfg.actor_rollout_ref.actor.fsdp_config.model_dtype == "bf16"
+    assert cfg.actor_rollout_ref.actor.fsdp_config.model_dtype == "fp32"
     assert cfg.trainer.use_v1 is True
     assert cfg.trainer.v1.trainer_mode == "sync"
     assert cfg.actor_rollout_ref.rollout.agent.default_agent_loop == "loom_memory"

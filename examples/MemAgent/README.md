@@ -85,7 +85,9 @@ CUDA_VISIBLE_DEVICES=0 bash examples/MemAgent/run_memagent_verl.sh trainer.total
 ```
 
 先修改脚本顶部的模型、训练/验证 Parquet 和输出目录。也可追加原生 VERL 参数覆盖
-路径，例如 `"data.train_files=['/path/to/train.parquet']"`。完整训练尚需 GPU 验证。
+路径，例如 `"data.train_files=['/path/to/train.parquet']"`。H100 单卡已完成 100 步训练
+与 128 题完整验证，准确率从同配置初始模型的 7.62% 提升至 20.90%。
+配置、权重差异与完整评测证据见[验证报告](../../docs/memagent_verl_validation.md)。
 
 slime 接入使用原生 custom-generate hook；一条轨迹返回多个共享 `rollout_id` 的原生
 `Sample`，保持每步上下文独立。原生 BatchBuilder 按完整轨迹归一化终局奖励，模型更新
@@ -131,4 +133,4 @@ bash -n examples/MemAgent/run_memagent.sh
 bash -n examples/MemAgent/run_memagent_verl.sh
 ```
 
-这些检查覆盖迁移后的固定流程、记忆隔离、奖励和 mask、生成上限、原生采样组映射、启动参数及包导入边界，使用可控的假推理后端。VeRL 专项测试在安装 VeRL 的环境中执行，覆盖真实 DataProto 和原生 GRPO；未安装 VeRL 时会跳过该测试文件。完整 GPU 采样、反向传播和权重同步尚未运行。
+这些检查覆盖迁移后的固定流程、记忆隔离、奖励和 mask、生成上限、原生采样组映射、启动参数及包导入边界，使用可控的假推理后端。VeRL 专项测试在安装 VeRL 的环境中执行，覆盖真实 DataProto 和原生 GRPO；未安装 VeRL 时会跳过该测试文件。VERL 已完成 H100 上的真实采样、反向传播、权重同步和 100 步训练后完整验证；记录见上述验证报告。

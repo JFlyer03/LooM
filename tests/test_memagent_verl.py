@@ -17,6 +17,18 @@ from loom.integrations.verl.memory_agent_loop import MemoryAgentLoop
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_memory_dataset_preserves_reference_answers_for_validation(monkeypatch):
+    from loom.integrations.verl.memory_dataset import MemoryDataset, RLHFDataset
+
+    monkeypatch.setattr(RLHFDataset, "__getitem__", lambda self, item: {
+        "instance": {"answers": ["Chief of Protocol", "US Chief of Protocol"]},
+    })
+    example = MemoryDataset.__new__(MemoryDataset)[0]
+    assert example["reward_model"] == {
+        "style": "rule", "ground_truth": ["Chief of Protocol", "US Chief of Protocol"],
+    }
+
+
 @pytest.mark.parametrize("total,free,raises", [(0, 0, False), (1024, 0, True), (1024, 512, False)])
 def test_vllm_shm_check_distinguishes_unlimited_tmpfs_from_a_full_mount(monkeypatch, total, free, raises):
     from vllm.distributed.device_communicators import shm_broadcast
@@ -73,11 +85,17 @@ def test_native_agent_loop_emits_each_reset_context_in_one_session(tmp_path):
     OmegaConf.save(task, path)
 
     class Client:
+        calls = 0
+
         async def generate(self, request_id, prompt_ids, sampling_params):
+            self.calls += 1
             prompt = Tokenizer().decode(prompt_ids)
             text = "memory" if "<section>" in prompt else r"\boxed{France}"
             tokens = Tokenizer().encode(text)
-            return TokenOutput(token_ids=tokens, log_probs=[-.5] * len(tokens), stop_reason="completed")
+            return TokenOutput(
+                token_ids=tokens, log_probs=[-.5] * len(tokens), stop_reason="completed",
+                extra_fields={"min_global_steps": self.calls - 1, "max_global_steps": self.calls},
+            )
 
     loop = MemoryAgentLoop.__new__(MemoryAgentLoop)
     loop.config = OmegaConf.create({"skyrl_agent": {"task_yaml": str(path)}})
@@ -90,8 +108,10 @@ def test_native_agent_loop_emits_each_reset_context_in_one_session(tmp_path):
     assert "ABC" in Tokenizer().decode(outputs[0].prompt_ids)
     assert "DEF" not in Tokenizer().decode(outputs[0].prompt_ids)
     assert "DEF" in Tokenizer().decode(outputs[1].prompt_ids)
-    for output in outputs:
+    for i, output in enumerate(outputs):
         packed = output.as_dict()
+        assert packed["extra_fields"]["min_global_steps"] == i
+        assert packed["extra_fields"]["max_global_steps"] == i + 1
         assert output.reward_score == 1.
         assert packed["rollout_log_probs"].shape == packed["response_mask"].shape
         assert packed["rm_scores"].sum().item() == 1.

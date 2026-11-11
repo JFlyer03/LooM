@@ -1,11 +1,13 @@
 # 按后端隔离 conda 环境
 
 当前采用三个独立的 Python 3.12 环境，三个后端使用同一份 LooM 代码、模型文件和数据集。
-旧 `loom` 按用户要求保留，暂不删除。`loom-rebuild` 是先前的统一环境实验，不作为正式训练环境。
+旧 `loom` 仍被 Memory-TTT 的运行任务和派生虚拟环境使用，暂不能删除；清理前需先迁移这些依赖。
+先前统一环境实验 `loom-rebuild` 已于 2026-11-10 删除，包清单备份位于本机
+`~/.cache/loom-env-backups/20261110/`。
 
 | 环境 | 训练 / 推理组合 | 状态 |
 | --- | --- | --- |
-| `loom-verl` | VERL 原生 FSDP + vLLM | Python 3.12 基础环境已创建，后端安装与训练验证待完成 |
+| `loom-verl` | VERL 原生 FSDP + vLLM | 已完成 100 步训练及完整验证，准确率 7.62% → 20.90%；75 项测试通过 |
 | `loom-slime` | slime 原生 Megatron + SGLang | 已安装；H100 单卡 MemAgent 连续两轮训练、保存和评估通过 |
 | `loom-skyrl` | SkyRL 原生 FSDP + vLLM | Python 3.12 基础环境已创建，后端安装与训练验证待完成 |
 
@@ -35,17 +37,9 @@ python -m pip check
 这段命令只安装 LooM 公共部分，不等于已经安装训练后端。GPU 依赖分别按对应上游的
 锁文件和构建流程安装，不将三个后端的 extras 合并。
 
-VERL 的固定源码已有原生锁文件，下面的安装路径已通过 dry-run；实际安装及完整训练
-仍需继续验证：
-
-```bash
-conda activate loom-verl
-cd /home/sunjiankang/projects/LooM
-python -m pip install uv packaging
-python scripts/prepare_unified_sources.py
-UV_PROJECT_ENVIRONMENT="$CONDA_PREFIX" uv sync \
-  --project .backend-src/verl --locked --extra fsdp --extra vllm
-```
+VERL 使用本项目的[独立环境安装与运行步骤](verl.md)及 `verl.lock.txt`。
+该清单在原生后端锁文件基础上修正了三处依赖声明冲突，并包含本机需要的共享内存补丁。
+训练与评测命令也见该文档。不要直接执行上游 `uv sync` 覆盖已修正的版本。
 
 SkyRL 使用 [FSDP 安装流程](https://docs.skyrl.ai/docs/getting-started/installation)；
 slime 使用本项目已验证的[独立环境安装与运行步骤](slime.md)，包含匹配的 Megatron、
@@ -58,7 +52,8 @@ SGLang、CUDA 编译工具和上游补丁，无需执行会写入 `/root` 的原
 这些结果不能当成新建的三个环境已经可用的证据。
 
 slime 已在独立环境验证真实采样、GRPO、优化器更新、权重同步、checkpoint 保存及评估；
-安装清单见 `slime.txt`，传递依赖锁见 `slime.lock.txt`。其他后端仍需分别完成训练验证。
+安装清单见 `slime.txt`，传递依赖锁见 `slime.lock.txt`。VERL 的独立环境训练和完整验证集
+评测已有[实测记录](../docs/memagent_verl_validation.md)；SkyRL 仍待完成训练验证。
 旧 V0 rollout 已删除。
 
 `experimental-unified.txt` 仅保留统一环境实验记录；`build_unified_wheels.py --backend slime`

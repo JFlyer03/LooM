@@ -88,4 +88,4 @@ MemAgent 的 VERL 入口已升级到原生 V1/TransferQueue AgentLoop，每个�
 
 对应的记忆库启动配置在 [examples/RMM](../examples/RMM/README.md) 和 [examples/Memory-R1](../examples/Memory-R1/README.md)，分别选择重排目标和更新目标；Memory-R1 可在 YAML 中切换为抽取目标。
 
-离线测试覆盖全部迁移模块的提示词、注册、临时 ID、存储操作与隔离、MemAgent 循环、Memory-R1 阶段奖励及 mask、RMM 固定准备与重排分工。测试使用受控推理和裁判；另已通过 slime 的 H100 单卡 MemAgent 训练验证。其他 GPU 组合、真实数据库和外部模型效果尚未验证。
+离线测试覆盖全部迁移模块的提示词、注册、临时 ID、存储操作与隔离、MemAgent 循环、Memory-R1 阶段奖励及 mask、RMM 固定准备与重排分工。测试使用受控推理和裁判；另已通过 slime 与 VERL 的 H100 单卡 MemAgent 真实训练验证，VERL 的完整验证集结果见[实测记录](memagent_verl_validation.md)。其他 GPU 组合、真实数据库和外部模型效果尚未验证。

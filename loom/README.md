@@ -32,7 +32,7 @@ python -m pytest tests -q
 VERL 记忆入口使用原生 V1 多输出 AgentLoop；slime 通过原生 custom-generate hook
 执行记忆轨迹并保留每个独立上下文。两者都由后端负责 GRPO、模型更新与权重同步。
 
-slime 的 H100 单卡 MemAgent 训练、权重同步、保存和评估已通过，详见 [slime 安装与验证](../requirements/slime.md)。其他后端仍需分别完成 GPU 训练验证。
+slime 的 H100 单卡 MemAgent 训练、权重同步、保存和评估已通过，详见 [slime 安装与验证](../requirements/slime.md)。VERL 的 H100 单卡训练与完整验证集评测已有[实测记录](../docs/memagent_verl_validation.md)。SkyRL 仍需完成独立环境的 GPU 训练验证。
 
 不要使用 `skyrl-agent/pyproject.toml` 安装本包：它安装的是另一个保留的原始副本。这里使用根目录的新 `pyproject.toml`。
 
@@ -52,7 +52,7 @@ python -m loom.tasks.prepare_memory_data \
 
 ## 配置与启动
 
-SkyRL 入口配置：[examples/MemAgent/memagent.yaml](../examples/MemAgent/memagent.yaml)。VeRL 对应入口为 [run_memagent_verl.sh](../examples/MemAgent/run_memagent_verl.sh)，使用 [memagent_verl.yaml](../examples/MemAgent/memagent_verl.yaml)，默认使用面向 H100 的单卡 FSDP + 异步 vLLM V1 rollout。完整 GPU 训练尚未验证；具体版本和精度限制见 [MemAgent 示例](../examples/MemAgent/README.md)。
+SkyRL 入口配置：[examples/MemAgent/memagent.yaml](../examples/MemAgent/memagent.yaml)。VeRL 对应入口为 [run_memagent_verl.sh](../examples/MemAgent/run_memagent_verl.sh)，使用 [memagent_verl.yaml](../examples/MemAgent/memagent_verl.yaml)，默认使用面向 H100 的单卡 FSDP + 异步 vLLM V1 rollout。H100 原生训练、权重同步、checkpoint 保存及完整验证集评测已有[实测记录](../docs/memagent_verl_validation.md)；具体配置见 [MemAgent 示例](../examples/MemAgent/README.md)。
 
 记忆库算法的对应配置和简洁启动脚本在 [RMM](../examples/RMM/README.md) 与 [Memory-R1](../examples/Memory-R1/README.md)。RMM 默认只训练重排，Memory-R1 默认训练更新阶段。
 
