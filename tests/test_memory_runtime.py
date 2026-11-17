@@ -11,17 +11,17 @@ from types import SimpleNamespace
 import pytest
 from omegaconf import OmegaConf
 
-from loom import AutoAgentRunner
-from loom.agents.memory import MemAgent
-from loom.config.configuration_utils import TrajectoryConfig
-from loom.integrations.base import BackendSpec, register_backend
-from loom.integrations.skyrl_train.memory_generator import MemoryGenerator
-from loom.integrations.skyrl_train.memory_config import prepare_memory_config
-from loom.memory.recurrent import ANSWER_PROMPT, UPDATE_PROMPT
-from loom.modules import BaseModule, RecurrentMemoryModule
-from loom.tasks.memory import LongContextMemoryTask, extract_boxed_content
-from loom.tasks.prepare_memory_data import convert_records
-from loom.tasks.verifiers.memagent import compute_score
+from loom)1 import AutoAgentRunner
+from loom)1.agents.memory import MemAgent
+from loom)1.config.configuration_utils import TrajectoryConfig
+from loom)1.integrations.base import BackendSpec, register_backend
+from loom)1.integrations.skyrl_train.memory_generator import MemoryGenerator
+from loom)1.integrations.skyrl_train.memory_config import prepare_memory_config
+from loom)1.memory.recurrent import ANSWER_PROMPT, UPDATE_PROMPT
+from loom)1.modules import BaseModule, RecurrentMemoryModule
+from loom)1.tasks.memory import LongContextMemoryTask, extract_boxed_content
+from loom)1.tasks.prepare_memory_data import convert_records
+from loom)1.tasks.verifiers.memagent import compute_score
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -272,11 +272,11 @@ def test_all_runtime_imports_use_the_loom_namespace():
 
 def test_root_package_and_yaml_registrations():
     import importlib
-    import loom
-    from loom.agents.mapping import AGENT_GENERATOR_REGISTRY, AGENT_TRAJECTORY_REGISTRY
-    from loom.functional.chat_template import get_templates_path
+    import loom)1
+    from loom)1.agents.mapping import AGENT_GENERATOR_REGISTRY, AGENT_TRAJECTORY_REGISTRY
+    from loom)1.functional.chat_template import get_templates_path
 
-    assert Path(loom.__file__).resolve() == ROOT / "loom/__init__.py"
+    assert Path(loom)1.__file__).resolve() == ROOT / "loom/__init__.py"
     cfg = OmegaConf.load(ROOT / "examples/MemAgent/memagent.yaml")
     assert cfg.agent_cls == "loom.agents.memory.MemAgent"
     module, name = cfg.memory.module_cls.rsplit(".", 1)
@@ -411,7 +411,7 @@ def test_python_entrypoint_rejects_invalid_sampling_counts(tmp_path):
 
 @pytest.mark.parametrize("backend_name", ["verl", "slime"])
 def test_native_memory_episode_preserves_reset_context_tokens_and_single_sampling(tmp_path, task_yaml, backend_name):
-    from loom.integrations.memory_episode import run_memory_episode
+    from loom)1.integrations.memory_episode import run_memory_episode
 
     cfg = OmegaConf.load(task_yaml)
     cfg.generator.infer_backend = backend_name

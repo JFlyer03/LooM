@@ -8,8 +8,8 @@ import pytest
 import torch
 from omegaconf import OmegaConf
 
-from loom.integrations.verl.memory_config import prepare_memory_overrides
-from loom.integrations.verl.memory_adapter import validate_memory_training
+from loom)1.integrations.verl.memory_config import prepare_memory_overrides
+from loom)1.integrations.verl.memory_adapter import validate_memory_training
 
 
 ROOT = Path(__file__).resolve().parents[1]

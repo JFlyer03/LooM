@@ -7,8 +7,8 @@ import sys
 import pytest
 from omegaconf import OmegaConf
 
-from loom.integrations.slime.memory_main import prepare_args
-from loom.integrations.slime.prepare_data import convert_for_slime
+from loom)1.integrations.slime.memory_main import prepare_args
+from loom)1.integrations.slime.prepare_data import convert_for_slime
 
 
 ROOT = Path(__file__).resolve().parents[1]

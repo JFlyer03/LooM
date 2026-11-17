@@ -186,6 +186,7 @@ class MemoryBankEnv(BaseEnv):
                                         self.store.save(new_mem)
                         else:
                             update_err = True
+                        
                         if update_err:
                             upd_reward = 0.0 # newly added
                         if not update_err:

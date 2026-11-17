@@ -25,9 +25,11 @@ def main():
     cli_parser.add_argument("--wandb_name", type=str, default=None, help="SwanLab experiment name")
     
     # We parse known args for CLI, and the rest for MemGRPOArguments
+    # 模型路径、数据路径、实验名 -> args
     args, remaining_args = cli_parser.parse_known_args()
     
     # Parse MemGRPOArguments from remaining_args
+    # 训练参数、Agent 类型、环境类型 -> MemGRPOArguments
     grpo_args = parser.parse_args_into_dataclasses(args=remaining_args)[0]
     
     print(f"Loading model from {args.model_name_or_path}...")

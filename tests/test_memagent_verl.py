@@ -12,13 +12,13 @@ from omegaconf import OmegaConf
 from verl import DataProto
 from verl.workers.rollout.replica import TokenOutput
 from verl.trainer.ppo.v1.utils import compute_advantage_for_multi_trajectories
-from loom.integrations.verl.memory_agent_loop import MemoryAgentLoop
+from loom)1.integrations.verl.memory_agent_loop import MemoryAgentLoop
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_memory_dataset_preserves_reference_answers_for_validation(monkeypatch):
-    from loom.integrations.verl.memory_dataset import MemoryDataset, RLHFDataset
+    from loom)1.integrations.verl.memory_dataset import MemoryDataset, RLHFDataset
 
     monkeypatch.setattr(RLHFDataset, "__getitem__", lambda self, item: {
         "instance": {"answers": ["Chief of Protocol", "US Chief of Protocol"]},

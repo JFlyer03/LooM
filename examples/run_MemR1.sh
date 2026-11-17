@@ -41,6 +41,8 @@ cd "$(dirname "$0")/.." # Go to project root
 echo "Starting MemR1 Training..."
 echo "Model: $MODEL_NAME"
 echo "Env: $ENV_TYPE | Agent: $AGENT_TYPE"
+  
+# train_extraction和train_update 控制的是 Extractor 和 Updater 两类训练样本，Extractor 和 Updater 共享同一套模型参数。
 
 python3 examples/train_mem_grpo.py \
     --model_name_or_path "$MODEL_PATH" \

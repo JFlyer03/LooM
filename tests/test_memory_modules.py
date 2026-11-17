@@ -7,17 +7,17 @@ from types import SimpleNamespace
 import pytest
 from omegaconf import OmegaConf
 
-from loom import AutoAgentRunner
-from loom.agents.memory import MemAgent, MemoryR1Agent, MemoryRMMAgent
-from loom.common.registry import AGENT_REGISTRY, ENV_REGISTRY, MODULE_REGISTRY
-from loom.envs.memory_bank_utils import MemoryItem, get_memory_store
-from loom.integrations.base import BackendSpec, register_backend
-from loom.integrations.skyrl_train.memory_generator import MemoryGenerator
-from loom.modules import NaiveExtractor, NaiveUpdater, RerankRetriever, build_module
-from loom.modules.memory_extractor import EXTRACTION_PROMPT_EN
-from loom.modules.memory_updater import UPDATE_MEMORY_PROMPT
-from loom.modules.memory_retriever import RERANK_PROMPT
-from loom.tasks.prepare_memory_data import convert_records
+from loom)1 import AutoAgentRunner
+from loom)1.agents.memory import MemAgent, MemoryR1Agent, MemoryRMMAgent
+from loom)1.common.registry import AGENT_REGISTRY, ENV_REGISTRY, MODULE_REGISTRY
+from loom)1.envs.memory_bank_utils import MemoryItem, get_memory_store
+from loom)1.integrations.base import BackendSpec, register_backend
+from loom)1.integrations.skyrl_train.memory_generator import MemoryGenerator
+from loom)1.modules import NaiveExtractor, NaiveUpdater, RerankRetriever, build_module
+from loom)1.modules.memory_extractor import EXTRACTION_PROMPT_EN
+from loom)1.modules.memory_updater import UPDATE_MEMORY_PROMPT
+from loom)1.modules.memory_retriever import RERANK_PROMPT
+from loom)1.tasks.prepare_memory_data import convert_records
 from test_memory_runtime import Tokenizer, Input, Output, ID
 
 ROOT = Path(__file__).resolve().parents[1]

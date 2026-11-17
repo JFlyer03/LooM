@@ -2,6 +2,9 @@
 /MemAgent/
 SkyRL/
 skyrl-agent/
+.agents/
+verl/
+MemEngine/
 
 # RL train
 output/
@@ -11,7 +14,7 @@ experiments/*.sh
 *copy*.sh
 *True*.sh
 *.parquet
-
+datasets/
 
 # Temporary files
 tmp/

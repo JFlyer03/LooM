@@ -9,7 +9,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from loom.tasks.verifiers.memagent import compute_score
+from loom)1.tasks.verifiers.memagent import compute_score
 
 
 def score_dump(path, references, samples_per_question):

@@ -200,9 +200,9 @@ class MemGRPOTrainer:
         # 2. Initialize Agent
         AgentClass = AGENT_REGISTRY.get(self.args.agent_type)
         agent = AgentClass(
-            self.tokenizer, 
+            self.tokenizer,
             device=self.args.device,
-            chunk_size=self.args.chunk_size, 
+            chunk_size=self.args.chunk_size,
             max_chunk_number=self.args.max_chunk_number,
             num_generations=self.args.num_generations,
             max_generate_length=self.args.max_generate_length
@@ -251,10 +251,13 @@ class MemGRPOTrainer:
                         # Iterate over all types of samples returned by rollout
                         for step_type, samples in samples_dict.items():
                             should_train = True
+                            # 每次训练一种策略
                             if step_type == 'extraction' and not self.args.train_extraction:
                                 should_train = False
+                            
                             if step_type == 'update' and not self.args.train_update:
                                 should_train = False
+                            
                             if should_train and samples.rewards is not None:
                                 train_inputs = self._prepare_train_inputs(samples)
                                 self.train_step(train_inputs, step_count)

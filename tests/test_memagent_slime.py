@@ -32,7 +32,7 @@ def test_native_slime_centers_outcomes_once_for_unequal_memory_step_counts(by_st
 
 @pytest.mark.parametrize("evaluation", [False, True])
 def test_native_hook_preserves_context_tokens_and_per_step_weight_versions(tmp_path, monkeypatch, evaluation):
-    from loom.integrations.slime.memory_rollout import generate
+    from loom)1.integrations.slime.memory_rollout import generate
     from slime.rollout import sglang_rollout
     from slime.utils import http_utils
 
