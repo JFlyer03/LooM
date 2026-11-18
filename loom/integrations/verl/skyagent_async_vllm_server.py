@@ -14,14 +14,15 @@ except Exception:
 
 from vllm.inputs import TokensPrompt
 from vllm.outputs import RequestOutput
-from verl.workers.rollout.vllm_rollout.vllm_async_server import AsyncvLLMServerRegular
+from verl.workers.rollout.vllm_rollout.vllm_async_server import AsyncvLLMServer
 
 
 @ray.remote(num_cpus=1)
-class SkyAgentAsyncvLLMServer(AsyncvLLMServerRegular):
+# VERL 0.5.0 exports a Ray actor; inherit its implementation before decorating again.
+class SkyAgentAsyncvLLMServer(AsyncvLLMServer.__ray_metadata__.modified_class):
     async def generate(
         self, prompt_ids: list[int], sampling_params: dict[str, Any], request_id: str
-    ) -> Tuple[str, str]:
+    ) -> Tuple[str, Dict[str, Any]]:
         # max_tokens = self.max_model_len - len(prompt_ids)
         # sampling_params.pop("max_tokens", None)
         # sampling_params = SamplingParams(max_tokens=max_tokens, **sampling_params)
@@ -47,13 +48,15 @@ class SkyAgentAsyncvLLMServer(AsyncvLLMServerRegular):
             final_res = output
         assert final_res is not None
 
-        response_str = final_res.outputs[0].text
-        stop_reason = final_res.outputs[0].finish_reason
-        output_tokens = final_res.outputs[0].token_ids
+        completion = final_res.outputs[0]
+        sampled_logprobs = completion.logprobs
         meta_info = {
-            "output_tokens": output_tokens,
-            "finish_reason": stop_reason,
-            "logprobs": None,
+            "output_tokens": completion.token_ids,
+            "finish_reason": completion.finish_reason,
+            "logprobs": (
+                [logprobs[token].logprob for token, logprobs in zip(completion.token_ids, sampled_logprobs, strict=True)]
+                if sampled_logprobs is not None else None
+            ),
         }
 
-        return response_str, meta_info
+        return completion.text, meta_info

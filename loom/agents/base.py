@@ -132,7 +132,7 @@ class AgentRunner:
         self.task: BaseTask = _import_object(cfg.task)()
 
         # metadata
-        self.trajectories: Dict[str, Dict[str, BaseTrajectory]] = {}
+        self.trajectories: Dict[int, Dict[int, BaseTrajectory]] = {}
 
         # Will be set in subclasses
         self.agent_config = None
@@ -190,8 +190,8 @@ class AgentRunner:
     def _initialize_trajectories(self, val_mode: bool = False):
         for batch_id, content in enumerate(self.batch):
             data = self._get_data(content)
-            instance_id: str = data["instance_id"] if data["instance_id"] else batch_id
-            self.trajectories[instance_id] = {}
+            instance_id = data["instance_id"] if data["instance_id"] is not None else batch_id
+            self.trajectories[batch_id] = {}
             sampling_params = (
                 self.cfg.generator.val_config.sampling_params if val_mode else self.cfg.generator.sampling_params
             )
@@ -221,6 +221,7 @@ class AgentRunner:
                     debug_log=debug_log,
                     early_step_threshold=self.cfg.generator.get("early_step_threshold", 0),
                     enable_turn_reminder=enable_turn_reminder,
+                    agent_kwargs=OmegaConf.to_container(self.cfg.get("agent_kwargs", OmegaConf.create({})), resolve=True),
                 )
                 traj: BaseTrajectory = self.traj_cls(
                     cfg=traj_cfg,
@@ -230,7 +231,7 @@ class AgentRunner:
                     task=self.task,
                     val_mode=val_mode,
                 )
-                self.trajectories[instance_id][traj_id] = traj
+                self.trajectories[batch_id][traj_id] = traj
 
     def _post_process_results(self, return_tensors=False, val_mode: bool = False) -> Dict[str, Any]:
         """
@@ -240,9 +241,9 @@ class AgentRunner:
             A dictionary containing the processed results.
         """
         raw_reward_list = []
-        all_results = {}
         matched_results = []
         instance_list = []
+        input_rows = []
         error_list = []
         resolved_list = []
         traj_reward_list = []
@@ -253,19 +254,14 @@ class AgentRunner:
             self.cfg.generator.val_config.num_trajectories if val_mode else self.cfg.generator.num_trajectories
         )
 
-        for instance_id in self.trajectories:
-            for trajectory_id in self.trajectories[instance_id]:
-                all_results.setdefault(instance_id, {})[trajectory_id] = self.trajectories[instance_id][
-                    trajectory_id
-                ].result
-
         for batch_idx, content in enumerate(self.batch):
             data = self._get_data(content)
             instance = pd.Series(data["instance"])
-            instance_id = data["instance_id"] if data["instance_id"] else batch_idx
+            instance_id = data["instance_id"] if data["instance_id"] is not None else batch_idx
             instance["instance_id"] = instance_id  # safe mutation
-            trajectories = all_results.get(instance_id, {})
-            matched_results.extend(trajectories.values())
+            trajectories = self.trajectories[batch_idx]
+            matched_results.extend(traj.result for traj in trajectories.values())
+            input_rows.extend([batch_idx] * len(trajectories))
             instance_list.extend([instance] * len(trajectories))
 
         assert len(matched_results) == num_trajectories * len(
@@ -274,9 +270,8 @@ class AgentRunner:
 
         # Group results by instance_id for message handling
         results_by_instance = {}
-        for i, (instance, result) in enumerate(zip(instance_list, matched_results)):
-            instance_id = instance["instance_id"]
-            results_by_instance.setdefault(instance_id, []).append((i, result))
+        for i, (input_row, result) in enumerate(zip(input_rows, matched_results)):
+            results_by_instance.setdefault(input_row, []).append((i, result))
 
         global_fallback_set = None
         for results in results_by_instance.values():
@@ -302,8 +297,8 @@ class AgentRunner:
                         # Use corresponding global fallback result (same trajectory index)
                         fallback_res = global_fallback_set[j % len(global_fallback_set)]
                         print(f"Empty messages for instance_id {instance_id}, trajectory {idx}. Using global fallback.")
-                        for key, value in fallback_res.items():
-                            matched_results[idx][key] = copy.deepcopy(value)
+                        for key in ("messages", "transitions"):
+                            matched_results[idx][key] = copy.deepcopy(fallback_res.get(key, []))
                         matched_results[idx]["finish_reason"] = "error_runtime"
 
                 else:
@@ -313,8 +308,8 @@ class AgentRunner:
                 for idx, res in results:
                     if not res.get("messages", []):
                         print(f"Empty messages for instance_id {instance_id}, trajectory {idx}. Using local fallback.")
-                        for key, value in fallback.items():
-                            matched_results[idx][key] = copy.deepcopy(value)
+                        for key in ("messages", "transitions"):
+                            matched_results[idx][key] = copy.deepcopy(fallback.get(key, []))
                         matched_results[idx]["finish_reason"] = "error_runtime"
 
         # error evaluation mainly due to timeout during tool execution
@@ -334,6 +329,7 @@ class AgentRunner:
         all_messages = []
         all_prompts = []
         all_responses = []
+        legacy_trajectories = []
 
         # step-level
         prompt_input_ids = []
@@ -344,11 +340,15 @@ class AgentRunner:
         reward_list = []
         is_last_episode_list = []
         traj_idx_list = []
+        trajectory_rows = []
+        call_metadata = []
         step_finish_reason_list = []
 
         num_turns = []  # assistant-based turns
-        for result in matched_results:
-            current_traj_id = f"{result.get('instance_id')}-traj{result.get('trajectory_id')}"
+        for trajectory_row, result in enumerate(matched_results):
+            instance_id = instance_list[trajectory_row]["instance_id"]
+            trajectory_id = trajectory_row % num_trajectories
+            current_traj_id = f"{instance_id}-traj{trajectory_id}"
             messages = result.get("messages", [])
             # Count assistant messages as turns to match actual steps
             num_turns.append(sum(1 for m in messages if m.get("role") == "assistant"))
@@ -382,6 +382,8 @@ class AgentRunner:
                 all_prompts.append(prompt)
                 response = messages[starting_index:]
                 all_responses.append(response)
+                legacy_trajectories.append((trajectory_row, current_traj_id))
+                steps_per_trajectory.append(1)
                 # filter bad trajectories
                 if messages and messages[-1]["role"] == "assistant":
                     finish_reason = result.get("finish_reason", None)
@@ -405,10 +407,16 @@ class AgentRunner:
 
             # step-level results
             data_list = transitions_to_training_data(transitions)
+            if not data_list:
+                raise ValueError(f"Trajectory {current_traj_id} has no token data")
             for data in data_list:
                 prompt_input_ids.append(data.input_tokens)
                 response_ids.append(data.response_tokens)
-                logprobs.append(data.response_logprobs)
+                sampled_logprobs = data.response_logprobs
+                if sampled_logprobs is None and self.cfg.generator.infer_backend != "verl":
+                    sampled_logprobs = [0.0] * len(data.response_tokens)
+                logprobs.append(sampled_logprobs)
+                call_metadata.append(data.call_metadata)
                 response_assistant_mask.append(data.response_mask)
                 is_last_episode_list.append(False)
             is_last_episode_list[-1] = True
@@ -416,6 +424,7 @@ class AgentRunner:
             reward_list.extend([result.get("reward", False)] * len(data_list))
             step_finish_reason_list.extend([result.get("finish_reason", None)] * len(data_list))
             traj_idx_list.extend([current_traj_id] * len(data_list))
+            trajectory_rows.extend([trajectory_row] * len(data_list))
 
         # backward compatibility for old format
         # TODO(csy): remove this after oh_agent is updated
@@ -428,7 +437,7 @@ class AgentRunner:
                 return_dict=True,
                 # padding=True
             )
-            prompt_input_ids = prompt_encodings["input_ids"]
+            prompt_input_ids.extend(prompt_encodings["input_ids"])
 
             response_encodings = self.tokenizer.apply_chat_template(
                 all_responses,
@@ -438,12 +447,29 @@ class AgentRunner:
                 return_dict=True,
             )
 
-            response_ids = response_encodings["input_ids"]
-            response_assistant_mask = response_encodings["assistant_masks"]
-            # to be compatible with new format
-            logprobs = [None] * len(response_ids)
-            step_finish_reason_list = finish_reason_list
-            reward_list = resolved_list
+            response_ids.extend(response_encodings["input_ids"])
+            response_assistant_mask.extend(response_encodings["assistant_masks"])
+            for trajectory_row, traj_id in legacy_trajectories:
+                trajectory_rows.append(trajectory_row)
+                traj_idx_list.append(traj_id)
+                logprobs.append(None)
+                call_metadata.append([])
+                step_finish_reason_list.append(matched_results[trajectory_row]["finish_reason"])
+                reward_list.append(resolved_list[trajectory_row])
+                is_last_episode_list.append(True)
+
+            # Keep fragments in candidate order when both recording formats occur in a batch.
+            order = sorted(range(len(trajectory_rows)), key=trajectory_rows.__getitem__)
+            (
+                prompt_input_ids, response_ids, response_assistant_mask, logprobs, call_metadata,
+                step_finish_reason_list, reward_list, is_last_episode_list, traj_idx_list, trajectory_rows,
+            ) = (
+                [values[i] for i in order]
+                for values in (
+                    prompt_input_ids, response_ids, response_assistant_mask, logprobs, call_metadata,
+                    step_finish_reason_list, reward_list, is_last_episode_list, traj_idx_list, trajectory_rows,
+                )
+            )
 
         max_response_length = self.cfg.generator.max_prompt_length
         truncated_ids = []
@@ -467,7 +493,7 @@ class AgentRunner:
                         f"but finish_reason='{reason}' not in mask_out_reason={mask_out_reason}. "
                     )
                     # modify reason to CONTEXT_WINDOW_EXCEEDED
-                    finish_reason_list[idx] = "CONTEXT_WINDOW_EXCEEDED"
+                    step_finish_reason_list[idx] = "CONTEXT_WINDOW_EXCEEDED"
                 # Truncate tokens and masks
                 ids = ids[:max_response_length]
                 mask = mask[:max_response_length]
@@ -496,11 +522,10 @@ class AgentRunner:
 
         total_per_instance = defaultdict(int)
         resolved_per_instance = defaultdict(int)
-        for instance, reward in zip(instance_list, resolved_list):
-            instance_id = instance["instance_id"]
-            total_per_instance[instance_id] += 1
+        for input_row, reward in zip(input_rows, resolved_list):
+            total_per_instance[input_row] += 1
             if reward > 0:
-                resolved_per_instance[instance_id] += 1
+                resolved_per_instance[input_row] += 1
 
         # Track how many instances have resolution rate 0% or 100%
         num_resolved_0 = 0
@@ -539,7 +564,7 @@ class AgentRunner:
         ) / len(finish_reason_list)
         rollout_metrics["rollout_metrics/num_mask_out"] = sum(1 for mask in loss_mask if all(m == 0 for m in mask))
         rollout_metrics["rollout_metrics/num_mask_non_zero_reward"] = sum(
-            1 for mask, reward in zip(loss_mask, resolved_list) if all(m == 0 for m in mask) and reward > 0
+            1 for mask, reward in zip(loss_mask, reward_list) if all(m == 0 for m in mask) and reward > 0
         )
         rollout_metrics["rollout_metrics/bad_llm_response"] = sum(
             1 for reason in finish_reason_list if reason == "BAD_LLM_RESPONSE"
@@ -550,7 +575,7 @@ class AgentRunner:
         # Optional aggregation of tool-call profiling if available
         try:
             cfg_profile = None
-            for path in ("generator.profile_tools", "skyrl_agent.profile_tools"):
+            for path in ("generator.profile_tools", "loom.profile_tools"):
                 try:
                     cfg_profile = OmegaConf.select(self.cfg, path)
                 except Exception:
@@ -619,6 +644,9 @@ class AgentRunner:
             "episode_nums": steps_per_trajectory,
             "is_last_episode": is_last_episode_list,
             "traj_idx": traj_idx_list,
+            "input_rows": [input_rows[row] for row in trajectory_rows],
+            "trajectory_rows": trajectory_rows,
+            "call_metadata": call_metadata,
             "stop_reasons": [None] * len(prompt_input_ids),
             "rollout_logprobs": logprobs,
             "rollout_metrics": rollout_metrics,
@@ -647,6 +675,9 @@ class AgentRunner:
             num_trajectories = self.cfg.generator.num_trajectories
 
         # Initialize agents and other components
+        if num_trajectories < 1:
+            raise ValueError("num_trajectories must be positive")
+        self.trajectories = {}
         self._initialize_trajectories(val_mode=val_mode)
 
         generator_dispatcher: DispatcherType | None = DISPATCHER_REGISTRY.get(self.cfg.dispatcher.type)
@@ -679,13 +710,12 @@ class AgentRunner:
                     "num_instances": len(self.batch),
                     "num_trajectories": num_trajectories,
                 }
-            await generator_dispatcher(
-                dispatcher_cfg, self.trajectories, init_fn=init_fn, run_fn=run_fn, eval_fn=eval_fn
-            )
-
-        output = self._post_process_results(val_mode=val_mode)
-
-        # reset after run
-        self.trajectories = {}
+            try:
+                await generator_dispatcher(
+                    dispatcher_cfg, self.trajectories, init_fn=init_fn, run_fn=run_fn, eval_fn=eval_fn
+                )
+                output = self._post_process_results(val_mode=val_mode)
+            finally:
+                self.trajectories = {}
 
         return build_generator_output(self.cfg.generator.infer_backend, output).result

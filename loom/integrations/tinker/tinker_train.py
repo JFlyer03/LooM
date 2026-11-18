@@ -157,7 +157,7 @@ class Config:
     eval_every: int = 10
     resume_exp_name: str = None
 
-    skyrl_agent_task_yaml: str = None
+    loom_task_yaml: str = None
     dataset_file: str = None  # Path to the training dataset parquet file
     eval_dataset_file: str = None  # Path to the evaluation dataset parquet file
 
@@ -292,7 +292,7 @@ async def main(config: Config):
         logger.info(f"Loaded state from {load_state_path}")
 
     adam_params = types.AdamParams(learning_rate=config.learning_rate, beta1=0.9, beta2=0.95, eps=1e-8)
-    skyrl_agent_task_yaml_path = config.skyrl_agent_task_yaml
+    loom_task_yaml_path = config.loom_task_yaml
     tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
     # training loop
@@ -318,7 +318,7 @@ async def main(config: Config):
         sampling_client = service_client.create_sampling_client(model_path=sampling_path)
 
         agent_generator = AutoAgentRunner.from_task(
-            skyrl_agent_task_yaml_path, infer_engine=sampling_client, tokenizer=tokenizer
+            loom_task_yaml_path, infer_engine=sampling_client, tokenizer=tokenizer
         )
 
         if policy_iteration_step % config.eval_every == 0:
@@ -383,7 +383,7 @@ async def main(config: Config):
             # Try to infer from task config
             from omegaconf import OmegaConf
 
-            task_config = OmegaConf.load(skyrl_agent_task_yaml_path)
+            task_config = OmegaConf.load(loom_task_yaml_path)
             group_size = task_config.generator.get("num_trajectories", 1)
             logger.info(f"Auto-inferred group_size={group_size} from task config")
 

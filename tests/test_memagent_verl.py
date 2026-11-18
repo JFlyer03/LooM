@@ -98,7 +98,7 @@ def test_native_agent_loop_emits_each_reset_context_in_one_session(tmp_path):
             )
 
     loop = MemoryAgentLoop.__new__(MemoryAgentLoop)
-    loop.config = OmegaConf.create({"skyrl_agent": {"task_yaml": str(path)}})
+    loop.config = OmegaConf.create({"loom": {"task_yaml": str(path)}})
     loop.server_manager = Client()
     loop.tokenizer = Tokenizer()
     outputs = asyncio.run(loop.run({"temperature": .7}, uid="question", instance={

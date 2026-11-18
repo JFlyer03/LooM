@@ -76,15 +76,14 @@ def record_transition(func):
         # Call the original function (LLM generation)
         result = await func(self, *args, **kwargs)
         response_str, meta_info = result
-        print(f"response_str: {response_str}")
 
         # Extract action information
         output_tokens = meta_info.get("output_tokens", [])
         logprobs = meta_info.get("logprobs", None)
 
         action = TokensWithLogprobs(
-            token_ids=output_tokens,
-            logprobs=logprobs,
+            token_ids=list(output_tokens) if output_tokens is not None else [],
+            logprobs=list(logprobs) if logprobs is not None else None,
             text=response_str,
         )
 
@@ -122,8 +121,9 @@ class TrainingDatum:
 
     input_tokens: List[int]
     response_tokens: List[int]
-    response_logprobs: List[float]
+    response_logprobs: Optional[List[float]]
     response_mask: List[float]  # 0 for observation tokens, 1 for action tokens
+    call_metadata: List[Metrics] = field(default_factory=list)
 
 
 def _is_prefix(sequence: List[int], candidate: List[int]) -> bool:
@@ -159,8 +159,9 @@ def transitions_to_training_data(
 
     # Accumulator state for building sequences
     full_sequence: List[int] = []
-    sampled_logprobs: List[float] = []
+    sampled_logprobs: List[Optional[float]] = []
     mask: List[float] = []
+    call_metadata: List[Metrics] = []
 
     data: List[TrainingDatum] = []
 
@@ -179,16 +180,18 @@ def transitions_to_training_data(
         return TrainingDatum(
             input_tokens=input_tokens,
             response_tokens=response_tokens,
-            response_logprobs=response_logprobs,
+            response_logprobs=None if None in response_logprobs else response_logprobs,
             response_mask=response_mask,
+            call_metadata=call_metadata,
         )
 
     def clear_accumulator():
         """Clear the accumulator state."""
-        nonlocal full_sequence, sampled_logprobs, mask
+        nonlocal full_sequence, sampled_logprobs, mask, call_metadata
         full_sequence = []
         sampled_logprobs = []
         mask = []
+        call_metadata = []
 
     # Process each transition
     for transition in transitions:
@@ -197,13 +200,17 @@ def transitions_to_training_data(
 
         # Get action tokens and logprobs
         ac_tokens = transition.ac.token_ids
-        ac_logprobs = transition.ac.logprobs or [0.0] * len(ac_tokens)
+        ac_logprobs = transition.ac.logprobs
+        if ac_logprobs is None:
+            ac_logprobs = [None] * len(ac_tokens)
+        elif len(ac_logprobs) != len(ac_tokens):
+            raise ValueError("Generated tokens and logprobs must have the same length")
 
         # Determine delta observation (new tokens not in accumulated sequence)
         if len(full_sequence) == 0:
             # First transition, use all observation tokens
             delta_ob_tokens = ob_tokens
-        elif _is_prefix(full_sequence, ob_tokens):
+        elif not transition.metrics.get("reset_context") and _is_prefix(full_sequence, ob_tokens):
             # Current observation extends previous sequence
             # Only add the delta (new tokens)
             delta_ob_tokens = ob_tokens[len(full_sequence) :]
@@ -225,6 +232,7 @@ def transitions_to_training_data(
         full_sequence.extend(ac_tokens)
         sampled_logprobs.extend(ac_logprobs)
         mask.extend([1.0] * len(ac_tokens))
+        call_metadata.append(transition.metrics)
 
     # Create final datum from remaining accumulated state
     if full_sequence:

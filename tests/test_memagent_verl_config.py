@@ -38,7 +38,7 @@ def test_verl_launcher_forwards_paths_and_maps_task_settings(tmp_path):
     assert command["args"][:2] == ["-m", "loom.integrations.verl.memory_main"]
     args = command["args"][2:]
     cfg = parsed(args)
-    args += [f"+skyrl_agent.task_yaml={ROOT / cfg.skyrl_agent.task_yaml}"]
+    args += [f"+loom.task_yaml={ROOT / cfg.loom.task_yaml}"]
     cfg = parsed(prepare_memory_overrides(args))
     assert cfg.actor_rollout_ref.model.path == "/local/model with spaces"
     assert cfg.trainer.total_training_steps == 1
@@ -48,7 +48,7 @@ def test_verl_launcher_forwards_paths_and_maps_task_settings(tmp_path):
     assert cfg.actor_rollout_ref.actor.loss_agg_mode == "token-mean"
     assert cfg.actor_rollout_ref.actor.kl_loss_coef == 0.001
     assert cfg.actor_rollout_ref.model.override_config._attn_implementation == "sdpa"
-    assert cfg.actor_rollout_ref.rollout.n == cfg.skyrl_agent.num_trajectories == 16
+    assert cfg.actor_rollout_ref.rollout.n == cfg.loom.num_trajectories == 16
     assert cfg.actor_rollout_ref.rollout.val_kwargs.n == 4
     assert cfg.actor_rollout_ref.rollout.max_model_len == 8192
     assert cfg.actor_rollout_ref.rollout.max_num_seqs == 48
@@ -71,7 +71,7 @@ def test_verl_task_is_source_for_sampling_and_budgets(tmp_path):
     task.generator.max_prompt_length = 4096
     path = tmp_path / "task.yaml"
     OmegaConf.save(task, path)
-    args = prepare_memory_overrides([f"+skyrl_agent.task_yaml={path}", "--cfg", "job", "--resolve"])
+    args = prepare_memory_overrides([f"+loom.task_yaml={path}", "--cfg", "job", "--resolve"])
     assert args[-3:] == ["--cfg", "job", "--resolve"]
     cfg = parsed(args)
     assert cfg.actor_rollout_ref.rollout.n == 3
@@ -79,12 +79,12 @@ def test_verl_task_is_source_for_sampling_and_budgets(tmp_path):
     assert cfg.data.max_response_length == 128
     assert cfg.actor_rollout_ref.rollout.max_model_len == 4224
     with pytest.raises(ValueError, match="must match"):
-        prepare_memory_overrides([f"+skyrl_agent.task_yaml={path}", "actor_rollout_ref.rollout.n=8"])
+        prepare_memory_overrides([f"+loom.task_yaml={path}", "actor_rollout_ref.rollout.n=8"])
 
 
 def test_verl_entrypoint_rejects_skyrl_task():
     with pytest.raises(ValueError, match="infer_backend: verl"):
-        prepare_memory_overrides([f"+skyrl_agent.task_yaml={ROOT / 'examples/MemAgent/memagent.yaml'}"])
+        prepare_memory_overrides([f"+loom.task_yaml={ROOT / 'examples/MemAgent/memagent.yaml'}"])
 
 
 def test_verl_entrypoint_rejects_synchronous_rollout():
@@ -93,7 +93,7 @@ def test_verl_entrypoint_rejects_synchronous_rollout():
 
 def test_memory_launch_rejects_v100_before_starting_ray(monkeypatch):
     config = OmegaConf.create({
-        "skyrl_agent": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
+        "loom": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
         "algorithm": {"adv_estimator": "grpo", "use_kl_in_reward": False},
         "actor_rollout_ref": {"rollout": {"name": "vllm", "mode": "async"}},
     })
@@ -108,7 +108,7 @@ def test_memory_launch_rejects_v100_before_starting_ray(monkeypatch):
 
 def test_memory_launch_rejects_synchronous_rollout():
     config = OmegaConf.create({
-        "skyrl_agent": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
+        "loom": {"task_yaml": str(ROOT / "examples/MemAgent/memagent_verl.yaml")},
         "algorithm": {"adv_estimator": "grpo", "use_kl_in_reward": False},
         "actor_rollout_ref": {"rollout": {"name": "vllm", "mode": "sync"}},
     })

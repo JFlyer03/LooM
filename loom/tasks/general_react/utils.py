@@ -12,7 +12,7 @@ class GeneralReactTask(BaseTask):
 
     @classmethod
     def get_instruction(cls, instance: Dict[str, Any]) -> str:
-        # 
+        # 构造初始消息
         print(instance)
         # (TODO) Dacheng: A hack to make inference only compatible.
         # During inference, the key is "prompt"
@@ -97,12 +97,14 @@ class GeneralReactTask(BaseTask):
 
     @classmethod
     def complete_runtime(cls):
+        # 预留的任务收尾接口
         pass
 
     @classmethod
     async def evaluate_result(
         cls, result: any, instance: any, data_source: str, instance_id: int, trajectory_id: int
     ) -> float:
+        # 把执行结果转换为奖励
         # print(f"Evaluating result: {result=} {instance=} {data_source=} {instance_id=} {trajectory_id=}")
         ground_truth = instance["reward_model"]["ground_truth"]
         extra_info = instance["extra_info"]

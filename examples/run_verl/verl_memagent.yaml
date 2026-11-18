@@ -1,0 +1,33 @@
+agent_cls: loom.agents.memory.MemAgent
+task: loom.tasks.memory.LongContextMemoryTask
+tools: []
+
+agent_kwargs:
+  chunk_size: 2048
+
+data:
+  instance_key: instance
+  data_source_key: data_source
+
+generator:
+  infer_backend: verl
+  backend_config: null
+  num_trajectories: 4
+  max_iterations: 64
+  max_prompt_length: 4096
+  vision_is_active: false
+  qwen3_enable_thinking: false
+  qwen3_acc_thinking: false
+  sampling_params:
+    temperature: 1.0
+    max_tokens: 512
+  val_config:
+    num_trajectories: 1
+    sampling_params:
+      temperature: 0.0
+      max_tokens: 512
+
+dispatcher:
+  type: async_batch
+  max_parallel_agents: 4
+  max_eval_parallel_agents: 4

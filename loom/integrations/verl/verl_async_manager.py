@@ -82,7 +82,7 @@ class SkyAgentLoopManager(AgentLoopManager):
         # init generator
         self.server_manager = AsyncLLMServerManager(config, self.async_llm_servers)
         self.skyagent_generator = AutoAgentRunner.from_task(
-            task_yaml=config.skyrl_agent.task_yaml, infer_engine=self.server_manager, tokenizer=self.tokenizer
+            task_yaml=config.loom.task_yaml, infer_engine=self.server_manager, tokenizer=self.tokenizer
         )
 
         # Initially we're in sleep mode.
@@ -137,7 +137,7 @@ class SkyAgentLoopManager(AgentLoopManager):
         # All server instances are ready, init AsyncLLM engine.
         ray.get([server.init_engine.remote() for server in self.async_llm_servers])
 
-    def _postprocess(self, inputs: Dict[str, list[Any]]) -> DataProto:
+    def _postprocess(self, inputs: Dict[str, Any], val_mode: bool = False) -> DataProto:
         # NOTE: consistent with batch version of generate_sequences in vllm_rollout_spmd.py
         # prompts: left pad
         # responses: right pad
@@ -145,14 +145,18 @@ class SkyAgentLoopManager(AgentLoopManager):
         # attention_mask: [0,0,0,0,1,1,1,1, | 1,1,1,0,0,0,0,0]
         # position_ids:   [0,0,0,0,0,1,2,3, | 4,5,6,7,8,9,10,11]
 
+        rows = np.flatnonzero(inputs["is_last_episode"]) if val_mode else range(len(inputs["input_rows"]))
+        prompt_tokens = [inputs["prompt_token_ids"][i] for i in rows]
+        response_tokens = [inputs["response_ids"][i] for i in rows]
+
         # inputs
         self.tokenizer.padding_side = "left"
         max_prompt_length = max(
-            max([len(input_ids) for input_ids in inputs["prompt_token_ids"]]),
+            max(map(len, prompt_tokens)),
             self.config.actor_rollout_ref.rollout.prompt_length,
         )
         outputs = self.tokenizer.pad(
-            [{"input_ids": input_ids} for input_ids in inputs["prompt_token_ids"]],
+            [{"input_ids": input_ids} for input_ids in prompt_tokens],
             padding="max_length",
             max_length=max_prompt_length,
             return_tensors="pt",
@@ -163,11 +167,11 @@ class SkyAgentLoopManager(AgentLoopManager):
         # responses
         self.tokenizer.padding_side = "right"
         max_response_length = max(
-            max([len(response) for response in inputs["response_ids"]]),
+            max(map(len, response_tokens)),
             self.config.actor_rollout_ref.rollout.response_length,
         )
         outputs = self.tokenizer.pad(
-            [{"input_ids": response_ids} for response_ids in inputs["response_ids"]],
+            [{"input_ids": response_ids} for response_ids in response_tokens],
             padding="max_length",
             max_length=max_response_length,
             return_tensors="pt",
@@ -177,7 +181,8 @@ class SkyAgentLoopManager(AgentLoopManager):
 
         # response_mask
         response_length = response_ids.shape[1]
-        loss_masks = [loss_mask + [0] * (response_length - len(loss_mask)) for loss_mask in inputs["loss_masks"]]
+        loss_masks = [inputs["loss_masks"][i] for i in rows]
+        loss_masks = [mask + [0] * (response_length - len(mask)) for mask in loss_masks]
         response_mask = torch.tensor(loss_masks, dtype=torch.long)
         assert (
             response_ids.shape == response_mask.shape
@@ -200,9 +205,20 @@ class SkyAgentLoopManager(AgentLoopManager):
             batch_size=len(input_ids),
         )
 
+        call_metadata = np.empty(len(rows), dtype=object)
+        call_metadata[:] = [inputs["call_metadata"][i] for i in rows]
+        sampled_logprobs = np.empty(len(rows), dtype=object)
+        sampled_logprobs[:] = [inputs["rollout_logprobs"][i] for i in rows]
         return DataProto(
             batch=batch,
-            non_tensor_batch={"rewards": np.array(inputs["rewards"])},
+            non_tensor_batch={
+                "rewards": np.asarray(inputs["rewards"])[rows],
+                "rollout_input": np.asarray(inputs["input_rows"], dtype=np.int64)[rows],
+                "rollout_trajectory": np.asarray(inputs["trajectory_rows"], dtype=np.int64)[rows],
+                "rollout_final": np.asarray(inputs["is_last_episode"], dtype=bool)[rows],
+                "rollout_calls": call_metadata,
+                "rollout_sampled_logprobs": sampled_logprobs,
+            },
             meta_info={"rollout_metrics": inputs["rollout_metrics"], "timing": {}},
         )
 
@@ -215,16 +231,16 @@ class SkyAgentLoopManager(AgentLoopManager):
         Returns:
             DataProto: Output batch.
         """
-        if self.config.actor_rollout_ref.rollout.free_cache_engine:
+        free_cache = self.config.actor_rollout_ref.rollout.free_cache_engine
+        if free_cache:
             self.wake_up()
-        skyagent_output = asyncio.run(
-            self.skyagent_generator.run(prompts, val_mode=prompts.meta_info.get("val_mode", False))
-        )
-        output = self._postprocess(skyagent_output)
-        if self.config.actor_rollout_ref.rollout.free_cache_engine:
-            self.sleep()
-
-        return output
+        try:
+            val_mode = prompts.meta_info.get("val_mode", False)
+            skyagent_output = asyncio.run(self.skyagent_generator.run(prompts, val_mode=val_mode))
+            return self._postprocess(skyagent_output, val_mode=val_mode)
+        finally:
+            if free_cache:
+                self.sleep()
 
     def wake_up(self):
         """Wake up all rollout server instances."""

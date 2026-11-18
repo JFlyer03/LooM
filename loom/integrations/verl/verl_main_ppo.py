@@ -17,6 +17,7 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 
 import os
 import socket
+from importlib.resources import files
 
 import hydra
 import ray
@@ -32,7 +33,9 @@ from collections import defaultdict
 
 from verl.workers.reward_manager import register
 from verl.protocol import DataProto
-from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler, config_dir
+from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler
+
+config_dir = str(files("verl.trainer") / "config")
 
 
 @register("skyagent")
@@ -96,7 +99,7 @@ class SkyAgentRewardManager:
 
         if return_dict:
             return {
-                "reward_tensor":  ,
+                "reward_tensor":  reward_tensor,
                 "reward_extra_info": reward_extra_info,
             }
         else:
@@ -201,17 +204,17 @@ class TaskRunner:
         OmegaConf.resolve(config)
 
         # skyagent validation
-        # 读取yaml配置文件，确保skyrl_agent的num_trajectories与skyagent_task_yaml中的num_trajectories一致
-        if getattr(config, "skyrl_agent", None) is not None:
-            task_yaml = getattr(config.skyrl_agent, "task_yaml")
+        # 读取yaml配置文件，确保loom的num_trajectories与skyagent_task_yaml中的num_trajectories一致
+        if getattr(config, "loom", None) is not None:
+            task_yaml = getattr(config.loom, "task_yaml")
             import yaml
 
             with open(task_yaml, "r") as f:
                 print("Using Skyrlagent now")
                 skyagent_config = OmegaConf.create(yaml.safe_load(f))
                 assert (
-                    config.skyrl_agent.num_trajectories == skyagent_config.generator.num_trajectories
-                ), f"Verl configuration received num trajectories per instance `num_trajectories` of {config.skyrl_agent.num_trajectories} but the provided value in the `skyagent_task_yaml` is {skyagent_config.generator.num_trajectories}. Please ensure that both are consistent"
+                    config.loom.num_trajectories == skyagent_config.generator.num_trajectories
+                ), f"Verl configuration received num trajectories per instance `num_trajectories` of {config.loom.num_trajectories} but the provided value in the `skyagent_task_yaml` is {skyagent_config.generator.num_trajectories}. Please ensure that both are consistent"
 
         # Download the checkpoint from HDFS to the local machine.
         # `use_shm` determines whether to use shared memory, which could lead to faster model loading if turned on
@@ -270,7 +273,7 @@ class TaskRunner:
         else:
             raise NotImplementedError
 
-        from .verl_trainer import ResourcePoolManager, Role
+        from verl.trainer.ppo.ray_trainer import ResourcePoolManager, Role
 
         # Map roles to their corresponding remote worker classes.
         role_worker_mapping = {

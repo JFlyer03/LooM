@@ -101,25 +101,25 @@ async def async_pipeline_dispatcher(
 # Async Batch Dispatcher
 @register_dispatcher("async_batch")
 async def async_batch_dispatcher(cfg, trajectories: Dict[int, Dict[int, Any]], init_fn: str, run_fn: str, eval_fn: str):
-    async def run_all():
-        tasks = []
-        total_instances = cfg["num_instances"]
-        num_trajectories = cfg["num_trajectories"]
+    max_parallel = cfg["max_parallel_agents"]
+    max_eval_parallel = cfg["max_eval_parallel_agents"]
+    if min(max_parallel, max_eval_parallel) < 1:
+        raise ValueError("Trajectory concurrency limits must be positive")
+    generation_slots = asyncio.Semaphore(max_parallel)
+    evaluation_slots = asyncio.Semaphore(max_eval_parallel)
 
-        async def one_traj(instance_id, trajectory_id):
-            traj = trajectories[instance_id][trajectory_id]
+    async def one_traj(traj):
+        async with generation_slots:
             if init_fn is not None:
                 await getattr(traj, init_fn)()
             await getattr(traj, run_fn)()
+        async with evaluation_slots:
             await getattr(traj, eval_fn)()
 
-        for instance_id in trajectories.keys():
-            for trajectory_id in range(num_trajectories):
-                tasks.append(asyncio.create_task(one_traj(instance_id, trajectory_id)))
-
-        await asyncio.gather(*tasks)
-
-    await run_all()
+    async with asyncio.TaskGroup() as tasks:
+        for candidates in trajectories.values():
+            for traj in candidates.values():
+                tasks.create_task(one_traj(traj))
 
 
 # Async FixedEnv Pool Dispatcher (Env Pool Reuse)

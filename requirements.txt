@@ -1,5 +1,0 @@
-# Shared LooM application dependencies only.
-# Install ONE backend per conda environment; see requirements/README.md.
-# Do not combine VERL, slime and SkyRL extras in one environment.
--r requirements/common.txt
--r requirements/storage.txt

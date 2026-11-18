@@ -53,6 +53,7 @@ from verl.utils.metric import (
 from verl.trainer.ppo.ray_trainer import Role, compute_advantage, RayPPOTrainer
 
 from .upload_utils import upload_to_remote_background
+from .trajectory_batch import compute_trajectory_grpo
 
 
 WorkerType = type[Worker]
@@ -183,6 +184,9 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
         sample_outputs = []
         sample_scores = []
         sample_turns = []
+        dump_prompts = []
+        dump_references = []
+        val_data_dir = self.config.trainer.get("validation_data_dir", None)
 
         val_num_trajectories = (
             self.async_rollout_manager.skyagent_generator.cfg.generator.val_config.num_trajectories
@@ -206,9 +210,6 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
             input_ids = test_batch.batch["input_ids"]
             # TODO: Can we keep special tokens except for padding tokens?
             input_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in input_ids]
-
-            input_texts = sum([[input_text] * val_num_trajectories for input_text in input_texts], [])
-            sample_inputs.extend(input_texts)
 
             batch_keys_to_pop = ["input_ids", "attention_mask", "position_ids"]
             # non_tensor_batch_keys_to_pop = ["raw_prompt_ids", "instance", "data_source"]
@@ -260,12 +261,18 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                     test_gen_batch_padded
                 )  # [(B+P)*NT, S]
 
-            # unpad
-            # LooM will repeat trajectories by `val_num_trajectories` internally
-            test_output_gen_batch = unpad_dataproto(
-                test_output_gen_batch_padded, pad_size=pad_size * val_num_trajectories
-            )  # [B*NT, S]
-            num_val_samples = test_output_gen_batch.batch["responses"].shape[0]
+            if "rollout_input" in test_output_gen_batch_padded.non_tensor_batch:
+                padded_rows = test_output_gen_batch_padded.non_tensor_batch["rollout_input"]
+                test_output_gen_batch = test_output_gen_batch_padded.select_idxs(
+                    np.flatnonzero(padded_rows < len(test_gen_batch))
+                )
+                input_rows = test_output_gen_batch.non_tensor_batch["rollout_input"]
+            else:
+                test_output_gen_batch = unpad_dataproto(
+                    test_output_gen_batch_padded, pad_size=pad_size * val_num_trajectories
+                )
+                input_rows = np.repeat(np.arange(len(test_gen_batch)), val_num_trajectories)
+            sample_inputs.extend(input_texts[row] for row in input_rows)
 
             print("validation generation end")
 
@@ -274,10 +281,12 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
             output_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids]
             sample_outputs.extend(output_texts)
 
-            # repeat
-            test_batch = test_batch.repeat(repeat_times=val_num_trajectories, interleave=True)  # [B*NT, S]
-            # union
-            test_batch = test_batch.union(test_output_gen_batch)  # [B*NT, S]
+            test_batch = test_batch.select_idxs(input_rows).union(test_output_gen_batch)
+            if val_data_dir:
+                dump_prompts.extend(self.tokenizer.batch_decode(test_batch.batch["prompts"], skip_special_tokens=True))
+                for reward_model in test_batch.non_tensor_batch.get("reward_model", []):
+                    reference = reward_model.get("ground_truth")
+                    dump_references.append(reference.tolist() if hasattr(reference, "tolist") else reference)
 
             test_batch.meta_info["validate"] = True
 
@@ -298,18 +307,20 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                 sample_turns.append(test_batch.non_tensor_batch["__num_turns__"])
 
             if "data_source" in test_gen_batch.non_tensor_batch:
-                data_source_lst.append(test_gen_batch.non_tensor_batch["data_source"].copy())
+                data_source_lst.append(test_gen_batch.non_tensor_batch["data_source"][input_rows])
 
         self._maybe_log_val_generations(inputs=sample_inputs, outputs=sample_outputs, scores=sample_scores)
 
         # dump generations
-        val_data_dir = self.config.trainer.get("validation_data_dir", None)
         if val_data_dir:
+            dump_extra_info = dict(reward_extra_infos_dict)
+            if len(dump_references) == len(sample_scores):
+                dump_extra_info["gts"] = dump_references
             self._dump_generations(
-                inputs=sample_inputs,
+                inputs=dump_prompts,
                 outputs=sample_outputs,
                 scores=sample_scores,
-                reward_extra_infos_dict=reward_extra_infos_dict,
+                reward_extra_infos_dict=dump_extra_info,
                 dump_path=val_data_dir,
             )
 
@@ -491,6 +502,15 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                             metrics.update(rollout_metrics)
                             print("rollout metrics: ", rollout_metrics)
 
+                    rollout_metadata = gen_batch_output.non_tensor_batch
+                    split_trajectories = "rollout_final" in rollout_metadata and not rollout_metadata["rollout_final"].all()
+                    if split_trajectories and (
+                        self.config.algorithm.adv_estimator != AdvantageEstimator.GRPO
+                        or self.config.algorithm.use_kl_in_reward
+                        or self.use_rm
+                    ):
+                        raise ValueError("Split trajectories require GRPO with a terminal Task reward")
+
                     if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:
                         with marked_timer("gen_max", timing_raw, color="purple"):
                             gen_baseline_batch = deepcopy(gen_batch)
@@ -508,11 +528,18 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                             del gen_baseline_batch, gen_baseline_output
 
                     batch.non_tensor_batch["uid"] = np.array(
-                        [str(uuid.uuid4()) for _ in range(len(batch.batch))], dtype=object
+                        [str(uuid.uuid4()) for _ in range(len(batch))], dtype=object
                     )
-                    # repeat to align with repeated responses in rollout
-                    batch = batch.repeat(repeat_times=self.config.skyrl_agent.num_trajectories, interleave=True)
+                    if "rollout_input" in rollout_metadata:
+                        batch = batch.select_idxs(rollout_metadata["rollout_input"])
+                    else:
+                        batch = batch.repeat(repeat_times=self.config.loom.num_trajectories, interleave=True)
                     batch = batch.union(gen_batch_output)
+                    if split_trajectories and len(batch) % self.actor_rollout_wg.world_size:
+                        raise ValueError(
+                            "Split rollout batch must be divisible by the number of VeRL actor workers. "
+                            "Use one actor worker for arbitrary fragment counts."
+                        )
 
                     rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
                     if rollout_data_dir:
@@ -524,7 +551,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                         "Batch size: ",
                         len(batch.batch),
                         " Num trajectories: ",
-                        self.config.skyrl_agent.num_trajectories,
+                        self.config.loom.num_trajectories,
                     )
 
                     if "response_mask" not in batch.batch.keys():
@@ -627,15 +654,18 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                             "norm_adv_by_std_in_grpo", True
                         )  # GRPO adv normalization factor
 
-                        batch = compute_advantage(
-                            batch,
-                            adv_estimator=self.config.algorithm.adv_estimator,
-                            gamma=self.config.algorithm.gamma,
-                            lam=self.config.algorithm.lam,
-                            num_repeat=1,
-                            norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
-                            config=self.config.algorithm,
-                        )
+                        if split_trajectories:
+                            batch = compute_trajectory_grpo(batch, norm_adv_by_std=norm_adv_by_std_in_grpo)
+                        else:
+                            batch = compute_advantage(
+                                batch,
+                                adv_estimator=self.config.algorithm.adv_estimator,
+                                gamma=self.config.algorithm.gamma,
+                                lam=self.config.algorithm.lam,
+                                num_repeat=1,
+                                norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
+                                config=self.config.algorithm,
+                            )
 
                     # update critic
                     if self.use_critic:
