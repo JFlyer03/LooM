@@ -86,7 +86,7 @@ class ReActAgent:
         for name in tools:
             if name not in TOOL_REGISTRY:
                 raise ValueError(f"Unknown tool '{name}'. Must be one of: {list(TOOL_REGISTRY)}")
-            tool = TOOL_REGISTRY[name]()
+            tool = TOOL_REGISTRY[name]()    # 创建工具对象
             # Enforce unique function names per agent for ALL tools
             if tool.name in self.tools:
                 raise ValueError(

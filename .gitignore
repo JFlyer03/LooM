@@ -11,7 +11,9 @@ experiments/*.sh
 *copy*.sh
 *True*.sh
 *.parquet
-
+oss-backup-current/
+datasets/
+docs/
 
 # Temporary files
 tmp/

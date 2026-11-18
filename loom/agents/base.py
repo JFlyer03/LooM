@@ -1,15 +1,13 @@
-from __future__ import annotations
-
-from typing import Any, Dict, TypedDict, List, Optional, Type, Callable, TYPE_CHECKING
+from typing import Any, Dict, TypedDict, List, Optional, Type, Callable
 from collections import defaultdict
 from abc import ABC, abstractmethod
 import os
 import copy
 from omegaconf import OmegaConf, DictConfig
+import pandas as pd
 from loguru import logger
 from loom.tasks.base import BaseTask
-if TYPE_CHECKING:
-    from transformers import AutoTokenizer
+from transformers import AutoTokenizer
 from dataclasses import dataclass
 
 from loom.integrations.base import (
@@ -61,6 +59,7 @@ class RuntimeConfig:
         )
 
 
+@dataclass
 class TrajectoryResult(TypedDict):
     instance_id: str
     trajectory_id: str
@@ -222,7 +221,6 @@ class AgentRunner:
                     debug_log=debug_log,
                     early_step_threshold=self.cfg.generator.get("early_step_threshold", 0),
                     enable_turn_reminder=enable_turn_reminder,
-                    memory=OmegaConf.to_container(self.cfg.get("memory", OmegaConf.create({})), resolve=True),
                 )
                 traj: BaseTrajectory = self.traj_cls(
                     cfg=traj_cfg,
@@ -241,8 +239,6 @@ class AgentRunner:
         Returns:
             A dictionary containing the processed results.
         """
-        import pandas as pd
-
         raw_reward_list = []
         all_results = {}
         matched_results = []

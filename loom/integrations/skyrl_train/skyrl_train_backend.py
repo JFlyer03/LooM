@@ -1,12 +1,12 @@
 from typing import Any, List
 
+from skyrl.backends.skyrl_train.inference_servers.utils import resolve_policy_model_name
+
 from ..base import AsyncInferBackend, GeneratorOutput, GeneratorInput
 
 
 class SkyRLBackend(AsyncInferBackend):
     def __init__(self, infer_engine, tokenizer: Any = None, cfg: Any = None):
-        from skyrl.backends.skyrl_train.inference_servers.utils import resolve_policy_model_name
-
         self.client = infer_engine
         # Resolve the name the inference engine knows the policy by (base
         # model or registered LoRA adapter) once at construction. Threaded
@@ -35,7 +35,7 @@ class SkyRLBackend(AsyncInferBackend):
         meta_info = {
             "output_tokens": output["response_ids"][0],
             "finish_reason": output["stop_reasons"][0],
-            "logprobs": output["response_logprobs"][0] if output.get("response_logprobs") is not None else None,
+            "logprobs": None,
         }
         return output["responses"][0], meta_info
 

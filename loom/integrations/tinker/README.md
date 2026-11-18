@@ -1,6 +1,6 @@
-# Tinker Integration for SkyRL Agent
+# Tinker Integration for LooM
 
-This directory contains the integration between SkyRL Agent and Tinker's RL training framework.
+This directory contains the integration between LooM and Tinker's RL training framework.
 
 ## Overview
 
@@ -27,7 +27,7 @@ The Tinker integration enables you to:
    - Saves checkpoints periodically
 
 3. **`__init__.py`**: Backend registration
-   - Registers Tinker backend in the SkyRL Agent registry
+   - Registers Tinker backend in the LooM registry
 
 ## Data Flow
 

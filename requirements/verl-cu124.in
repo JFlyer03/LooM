@@ -1,0 +1,29 @@
+# Python 3.12 / NVIDIA driver 550 / CUDA 12.4 / glibc 2.31.
+# Compile and install using the commands in verl-cu124.md.
+-r common.txt
+-e .[data,test]
+verl==0.5.0
+torch==2.6.0+cu124
+torchvision==0.21.0+cu124
+torchaudio==2.6.0+cu124
+vllm==0.8.5
+xformers==0.0.29.post2
+flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp312-cp312-linux_x86_64.whl
+transformers==4.51.3
+tokenizers==0.21.4
+peft==0.15.2
+ray[default,cgraph]==2.47.1
+tensordict==0.8.3
+torchdata==0.11.0
+numpy==1.26.4
+pandas==2.3.3
+datasets==3.6.0
+opencv-python-headless==4.11.0.86
+litellm==1.74.15
+# vLLM 0.8.5 requires protobuf<5 through OpenTelemetry.
+neo4j>=6.1,<7
+pymilvus==2.5.10
+uv
+pip
+setuptools==80.10.2
+wheel

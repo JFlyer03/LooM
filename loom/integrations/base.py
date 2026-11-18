@@ -37,29 +37,25 @@ class BackendSpec:
         self.generator_input_cls = generator_input_cls
 
 
-def _get_backend_spec(name: str):
-    if name not in BACKEND_REGISTRY:
-        module = {"skyrl-train": "skyrl_train", "verl": "verl", "slime": "slime", "tinker": "tinker", "openai_server": "openai"}.get(name)
-        if module is not None:
-            importlib.import_module(f"{__package__}.{module}")
-    if name not in BACKEND_REGISTRY:
-        raise ValueError(f"Unknown backend: {name}")
-    return BACKEND_REGISTRY[name]
-
-
 def build_backend(name: str, **kwargs):
-    spec = _get_backend_spec(name)
+    spec = BACKEND_REGISTRY.get(name)
+    if not spec:
+        raise ValueError(f"Unknown backend: {name}")
     infer_backend = spec.infer_backend_cls(**kwargs)
     return infer_backend
 
 
 def build_generator_output(name: str, result: Any, **kwargs):
-    spec = _get_backend_spec(name)
+    spec = BACKEND_REGISTRY.get(name)
+    if not spec:
+        raise ValueError(f"Unknown backend: {name}")
     return spec.generator_output_cls(result=result, **kwargs)
 
 
 def build_generator_input(name: str, input_batch: Any, **kwargs):
-    spec = _get_backend_spec(name)
+    spec = BACKEND_REGISTRY.get(name)
+    if not spec:
+        raise ValueError(f"Unknown backend: {name}")
     return spec.generator_input_cls(input_batch=input_batch, **kwargs)
 
 

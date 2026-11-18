@@ -32,7 +32,6 @@ class SkyRLAgentGenerator(GeneratorInterface):
         if not os.path.exists(skyagent_task_yaml_path):
             raise FileNotFoundError(f"Task YAML not found: {skyagent_task_yaml_path}")
 
-        # 根据 yaml 配置初始化 AutoAgentRunner
         self.agent_generator = AutoAgentRunner.from_task(
             skyagent_task_yaml_path, infer_engine=llm_endpoint_client, tokenizer=tokenizer
         )
@@ -43,7 +42,6 @@ class SkyRLAgentGenerator(GeneratorInterface):
 
 
 class SkyRLAgentPPOExp(BasePPOExp):
-    # 复用SkyRL的 PPOExp，但替换掉 generator 和 trainer 两个组件
     def get_generator(self, cfg, tokenizer, llm_endpoint_client):
         generator = SkyRLAgentGenerator(
             generator_cfg=cfg.generator, llm_endpoint_client=llm_endpoint_client, tokenizer=tokenizer

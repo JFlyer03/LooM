@@ -105,30 +105,19 @@ async def async_batch_dispatcher(cfg, trajectories: Dict[int, Dict[int, Any]], i
         tasks = []
         total_instances = cfg["num_instances"]
         num_trajectories = cfg["num_trajectories"]
-        parallel = cfg.get("max_parallel_agents", total_instances * num_trajectories)
-        if parallel < 1:
-            raise ValueError("max_parallel_agents must be positive")
-        semaphore = asyncio.Semaphore(parallel)
 
         async def one_traj(instance_id, trajectory_id):
             traj = trajectories[instance_id][trajectory_id]
-            async with semaphore:
-                if init_fn is not None:
-                    await getattr(traj, init_fn)()
-                await getattr(traj, run_fn)()
-                await getattr(traj, eval_fn)()
+            if init_fn is not None:
+                await getattr(traj, init_fn)()
+            await getattr(traj, run_fn)()
+            await getattr(traj, eval_fn)()
 
         for instance_id in trajectories.keys():
             for trajectory_id in range(num_trajectories):
                 tasks.append(asyncio.create_task(one_traj(instance_id, trajectory_id)))
 
-        try:
-            await asyncio.gather(*tasks)
-        except BaseException:
-            for task in tasks:
-                task.cancel()
-            await asyncio.gather(*tasks, return_exceptions=True)
-            raise
+        await asyncio.gather(*tasks)
 
     await run_all()
 

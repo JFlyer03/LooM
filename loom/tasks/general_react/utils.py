@@ -12,6 +12,7 @@ class GeneralReactTask(BaseTask):
 
     @classmethod
     def get_instruction(cls, instance: Dict[str, Any]) -> str:
+        # 
         print(instance)
         # (TODO) Dacheng: A hack to make inference only compatible.
         # During inference, the key is "prompt"
