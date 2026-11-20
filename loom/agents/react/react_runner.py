@@ -1,7 +1,6 @@
 import pandas as pd
 
 from loom.agents.react.react_agent import ReActAgent
-
 from loom.agents.base import BaseTrajectory
 
 

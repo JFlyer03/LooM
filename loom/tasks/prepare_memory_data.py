@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .memory import LongContextMemoryTask
+from .long_context_memory import LongContextMemoryTask
 
 
 def convert_records(records):

@@ -19,9 +19,9 @@ This directory contains runnable examples for multiple tasks. Each section outli
     ```bash
     bash ./examples/run_verl/verl_oh.sh
     ```
-  - SkyRL-Train-based:
+  - SkyRL-Train-based (activate your separately installed SkyRL FSDP environment first):
     ```bash
-    bash ./examples/run_skyrl/skyrl_swe.sh
+    bash ./examples/run_skyrl/run_skyrl_swe.sh
     ```
 
 - Run inference (demo):
@@ -31,6 +31,8 @@ Launch an OpenAI API-compatible serving (e.g., vLLM or similar), then configure 
     ```
 
 ### 2) MemAgent Training
+
+For the VeRL recipe and its data preparation steps, see the [MemAgent VeRL example](run_verl/README.memagent.md).
 
 - Prepare dataset:
   ```bash
@@ -50,7 +52,7 @@ Launch an OpenAI API-compatible serving (e.g., vLLM or similar), then configure 
 
 ### 3) Deep Research (web_research_hle.sh)
 
-- Quick setup: `uv venv && uv sync`.
+- Quick setup: `uv sync --locked --extra verl` with Python 3.12.
 
 - Required `.env`: `WANDB_API_KEY`, `GOOGLE_SEARCH_KEY` (Serper key), `JINA_API_KEYS`, `WEB_SUMMARY_API_BASE`, `WEB_SUMMARY_MODEL` (e.g., `Qwen/Qwen3-32B`), `SKYAGENT_WEB_CACHE_DIR`, `STEM_LLM_JUDGE_URL`; optional blocklists.
 
@@ -75,7 +77,7 @@ Launch an OpenAI API-compatible serving (e.g., vLLM or similar), then configure 
 
 - Run:
   ```bash
-  bash ./examples/run_verl/web_research_hle.sh
+  bash ./examples/run_verl/verl_web_research_hle.sh
   ```
 
 ### 4) OSWorld

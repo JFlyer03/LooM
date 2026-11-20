@@ -12,14 +12,14 @@ import pytest
 from omegaconf import OmegaConf
 
 from loom import AutoAgentRunner
-from loom.agents.memory import MemAgent
+from loom.agents.long_context_memory import MemAgent
 from loom.config.configuration_utils import TrajectoryConfig
 from loom.integrations.base import BackendSpec, register_backend
 from loom.integrations.skyrl_train.memory_generator import MemoryGenerator
 from loom.integrations.skyrl_train.memory_config import prepare_memory_config
 from loom.memory.recurrent import ANSWER_PROMPT, UPDATE_PROMPT
 from loom.modules import BaseModule, RecurrentMemoryModule
-from loom.tasks.memory import LongContextMemoryTask, extract_boxed_content
+from loom.tasks.long_context_memory import LongContextMemoryTask, extract_boxed_content
 from loom.tasks.prepare_memory_data import convert_records
 from loom.tasks.verifiers.memagent import compute_score
 
@@ -278,7 +278,7 @@ def test_root_package_and_yaml_registrations():
 
     assert Path(loom.__file__).resolve() == ROOT / "loom/__init__.py"
     cfg = OmegaConf.load(ROOT / "examples/MemAgent/memagent.yaml")
-    assert cfg.agent_cls == "loom.agents.memory.MemAgent"
+    assert cfg.agent_cls == "loom.agents.long_context_memory.MemAgent"
     module, name = cfg.memory.module_cls.rsplit(".", 1)
     memory_cls = getattr(importlib.import_module(module), name)
     assert memory_cls is RecurrentMemoryModule

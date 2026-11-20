@@ -38,7 +38,7 @@ mkdir -p "${SKYAGENT_WEB_CACHE_DIR:-$DATA_DIR/web_cache}"
 # export TRANSFORMERS_OFFLINE=1  # Commented out to allow online checks
 # export HF_HOME=~/.cache/huggingface  # Use default cache location where models exist
 
-uv run --active --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
+uv run --isolated --locked --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
     algorithm.adv_estimator=grpo \
     data.train_files="${DATA_FILE}" \
     data.val_files="${VAL_FILE}" \

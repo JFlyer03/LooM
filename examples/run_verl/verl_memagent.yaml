@@ -1,6 +1,6 @@
-agent_cls: loom.agents.memory.MemAgent
+agent_cls: loom.agents.long_context_memory.MemAgent
 
-task: loom.tasks.memory.LongContextMemoryTask
+task: loom.tasks.long_context_memory.LongContextMemoryTask
 
 tools: []
 
@@ -9,13 +9,13 @@ data:
   data_source_key: data_source
 
 agent_kwargs:
-  chunk_size: 2048
+  chunk_size: 2048  # Source tokens per document chunk
 
 generator:
   infer_backend: verl
   backend_config: null
   num_trajectories: 4  # Number of trajectories per prompt for GRPO
-  max_iterations: 64
+  max_iterations: 64  # Maximum number of memory updates before the final answer
   max_prompt_length: 4096
   sampling_params:
     temperature: 1.0

@@ -21,7 +21,13 @@ VERL 的相应 CUDA 12.4 / PyTorch 2.6 / FlashAttention 2.7.4 组合见
 
 ## 安装
 
-从 LooM 根目录执行。已有 `loom-verl` 时跳过创建步骤：
+VeRL 启动脚本使用根目录的 `pyproject.toml` 和 `uv.lock`。从 LooM 根目录可直接检查 MemAgent 配置：
+
+```bash
+bash examples/run_verl/verl_memagent.sh --cfg job --resolve
+```
+
+如需在固定的 Conda 环境中执行调试或数据转换，可以用以下步骤安装。已有 `loom-verl` 时跳过创建步骤：
 
 ```bash
 conda create -n loom-verl python=3.12 pip -y

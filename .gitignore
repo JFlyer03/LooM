@@ -1,4 +1,6 @@
 /slime/
+/MemEngine/
+/verl/
 /MemAgent/
 SkyRL/
 skyrl-agent/
@@ -237,6 +239,7 @@ evaluation/data/temporal_locomo
 !requirements.txt
 !requirements-full.txt
 !requirements/*.txt
+!requirements/skyrl-dependency-audit.json
 
 # Pinned external sources and generated wheels for the unified runtime.
 /.backend-src/

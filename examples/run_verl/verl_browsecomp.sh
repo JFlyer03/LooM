@@ -13,7 +13,7 @@ SP_SIZE=4
 TP_SIZE=4
 
  
- uv run --isolated --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
+uv run --isolated --locked --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
     algorithm.adv_estimator=loop \
     data.train_files=$train_data \
     data.val_files=$test_data \
@@ -70,4 +70,4 @@ TP_SIZE=4
     +loom.task_yaml="./examples/run_verl/verl_browsecomp.yaml" \
     +loom.num_trajectories=1 \
     +trainer.remote_anyscale_upload=True \
-    +trainer.remote_upload_dir=remote_ckpts/skyagent-32b-r2e-verl/browsecomp-eval $@
+    +trainer.remote_upload_dir=remote_ckpts/skyagent-32b-r2e-verl/browsecomp-eval "$@"

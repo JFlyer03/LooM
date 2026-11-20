@@ -10,7 +10,7 @@ SP_SIZE=1
 TP_SIZE=1
 
  
- uv run --isolated --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
+uv run --isolated --locked --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
     algorithm.adv_estimator=grpo \
     data.train_files=$train_data \
     data.val_files=$test_data \
@@ -66,4 +66,4 @@ TP_SIZE=1
     +loom.task_yaml="./examples/run_verl/verl_search_r1.yaml" \
     +loom.num_trajectories=8 \
     +trainer.remote_anyscale_upload=True \
-    +trainer.remote_upload_dir=remote_ckpts/skyagent-4b-searchr1-verl/verl-4b-searchr1-qaem $@
+    +trainer.remote_upload_dir=remote_ckpts/skyagent-4b-searchr1-verl/verl-4b-searchr1-qaem "$@"

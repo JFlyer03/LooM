@@ -1,4 +1,4 @@
-"""Official MemAgent HotpotQA training verifier, kept local to loom.
+"""MemAgent HotpotQA training verifier, kept local to loom.
 
 Copied from BytedTsinghua-SIA/MemAgent, verl/utils/reward_score/hotpotqa.py
 (Apache-2.0). Keep its last-300-character, boxed-answer normalization semantics;

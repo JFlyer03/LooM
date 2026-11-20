@@ -1,7 +1,7 @@
 """Long-context question answering for memory agents."""
 
-from .base import BaseTask
-from .verifiers.memagent import compute_score
+from ..base import BaseTask
+from ..verifiers.memagent import compute_score
 
 
 class LongContextMemoryTask(BaseTask):

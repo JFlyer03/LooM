@@ -21,7 +21,7 @@ seed=1
 
 # export LD_LIBRARY_PATH="/opt/amazon/efa/lib:$LD_LIBRARY_PATH"
 
-uv run --isolated --env-file .env --extra skyrl-train \
+uv run --no-project --python "$(command -v python)" --env-file .env \
     --with vllm==0.9.2 \
     --with transformers==4.53.0 \
     --with torch==2.7.0 \

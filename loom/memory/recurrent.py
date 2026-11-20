@@ -1,5 +1,5 @@
 """Question-conditioned text memory used by MemAgent."""
-
+# 具体记忆机制的实现
 
 class RecurrentMemory:
     initial_state = "No previous memory"

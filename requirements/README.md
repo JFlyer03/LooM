@@ -44,7 +44,8 @@ VERL 使用本项目的[独立环境安装与运行步骤](verl.md)及 `verl.loc
 该清单在原生后端锁文件基础上修正了三处依赖声明冲突，并包含本机需要的共享内存补丁。
 训练与评测命令也见该文档。不要直接执行上游 `uv sync` 覆盖已修正的版本。
 
-SkyRL 使用 [FSDP 安装流程](https://docs.skyrl.ai/docs/getting-started/installation)；
+SkyRL 的[版本依赖与 LooM 接口调研](skyrl.md)已完成，尚未在本机安装或验证训练；
+上游安装参考 [FSDP 安装流程](https://docs.skyrl.ai/docs/getting-started/installation)。
 slime 使用本项目已验证的[独立环境安装与运行步骤](slime.md)，包含匹配的 Megatron、
 SGLang、CUDA 编译工具和上游补丁，无需执行会写入 `/root` 的原始构建脚本。
 

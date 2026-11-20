@@ -1,0 +1,2103 @@
+{
+  "collected_on": "2026-11-19",
+  "status": "research_only_not_an_installation_lock",
+  "profile": {
+    "python": "3.12",
+    "sys_platform": "linux",
+    "platform_machine": "x86_64",
+    "nvidia_driver": "550.90.07",
+    "cuda_toolkit": "12.4.131",
+    "glibc": "2.31"
+  },
+  "api_check_method": "Static wheel AST analysis of LooM imports, including relative wildcard re-exports; does not execute imports, check signatures, or prove training compatibility.",
+  "checked_imports": [
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+      "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+      "names": [
+        "resolve_policy_model_name"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+      "module": "skyrl.train.generators.utils",
+      "names": [
+        "get_rollout_metrics"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+      "module": "skyrl.train.config",
+      "names": [
+        "GeneratorConfig",
+        "SkyRLTrainConfig",
+        "make_config"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+      "module": "skyrl.train.generators.base",
+      "names": [
+        "GeneratorInterface",
+        "GeneratorInput",
+        "GeneratorOutput"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+      "module": "skyrl.backends.skyrl_train.inference_servers.base",
+      "names": [
+        "InferenceEngineInterface"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+      "module": "skyrl.train.entrypoints.main_base",
+      "names": [
+        "BasePPOExp",
+        "config_dir",
+        "validate_cfg"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+      "module": "skyrl.train.utils",
+      "names": [
+        "initialize_ray"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.trainer",
+      "names": [
+        "RayPPOTrainer"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.generators.base",
+      "names": [
+        "GeneratorInput",
+        "GeneratorOutput",
+        "TrajectoryID",
+        "BatchMetadata",
+        "TrainingPhase"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+      "names": [
+        "get_sampling_params_for_backend"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.dataset",
+      "names": [
+        "PromptDataset"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.config",
+      "names": [
+        "SkyRLTrainConfig"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.backends.skyrl_train.training_batch",
+      "names": [
+        "TrainingInputBatch"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.generators.utils",
+      "names": [
+        "prepare_generator_input",
+        "get_metrics_from_generator_output"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.utils",
+      "names": [
+        "Timer"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+      "names": [
+        "get_kl_controller"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.train.utils.trainer_utils",
+      "names": [
+        "validate_generator_output",
+        "ResumeMode",
+        "build_dataloader",
+        "calculate_per_dataset_metrics",
+        "dump_per_dataset_eval_results",
+        "concatenate_generator_outputs"
+      ]
+    },
+    {
+      "file": "loom/integrations/skyrl_train/trainer.py",
+      "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+      "names": [
+        "register_advantage_estimator"
+      ]
+    }
+  ],
+  "releases": [
+    {
+      "distribution": "skyrl",
+      "version": "0.1.0",
+      "source": "https://pypi.org/pypi/skyrl/0.1.0/json",
+      "requires_python": ">=3.11",
+      "wheel_url": "https://files.pythonhosted.org/packages/4e/61/06045245beed5bac6aa4e5055ac8a6afc0f74a330d140ec5e3194964c7a1/skyrl-0.1.0-py3-none-any.whl",
+      "wheel_sha256": "ac1b8d6203f3003e61fe353e9dbfdd1165abe91907238ac2f8fc259a3b2bb528",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "skyrl-train",
+        "fsdp"
+      ],
+      "requires_dist_for_linux_py312": [
+        "datasets>=4.0.0",
+        "pillow>=11.3.0",
+        "rich>=14.1.0",
+        "safetensors>=0.6.2",
+        "tokenizers>=0.21.2",
+        "transformers<5,>=4.56.1",
+        "typer>=0.17.4",
+        "peft",
+        "hf_transfer",
+        "cloudpathlib>=0.23.0",
+        "loguru; extra == \"skyrl-train\"",
+        "tqdm; extra == \"skyrl-train\"",
+        "ninja; extra == \"skyrl-train\"",
+        "tensorboard; extra == \"skyrl-train\"",
+        "func_timeout; extra == \"skyrl-train\"",
+        "transformers>=4.51.0; extra == \"skyrl-train\"",
+        "hydra-core==1.3.2; extra == \"skyrl-train\"",
+        "accelerate; extra == \"skyrl-train\"",
+        "torchdata; extra == \"skyrl-train\"",
+        "omegaconf; extra == \"skyrl-train\"",
+        "ray==2.51.1; extra == \"skyrl-train\"",
+        "peft; extra == \"skyrl-train\"",
+        "debugpy==1.8.0; extra == \"skyrl-train\"",
+        "hf_transfer; extra == \"skyrl-train\"",
+        "wandb; extra == \"skyrl-train\"",
+        "datasets>=4.0.0; extra == \"skyrl-train\"",
+        "tensordict; extra == \"skyrl-train\"",
+        "jaxtyping; extra == \"skyrl-train\"",
+        "skyrl-gym==0.2.0; extra == \"skyrl-train\"",
+        "flash-attn; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "polars; extra == \"skyrl-train\"",
+        "s3fs; extra == \"skyrl-train\"",
+        "fastapi; extra == \"skyrl-train\"",
+        "uvicorn; extra == \"skyrl-train\"",
+        "pybind11; extra == \"skyrl-train\"",
+        "setuptools; extra == \"skyrl-train\"",
+        "skyrl[skyrl-train]; extra == \"fsdp\"",
+        "vllm==0.16.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torch==2.9.1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-python==0.6.3; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-jit-cache==0.6.3; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "torchvision; sys_platform == \"linux\" and extra == \"fsdp\""
+      ],
+      "missing_imports": [
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+          "names": [
+            "resolve_policy_model_name"
+          ],
+          "module_exists": true,
+          "missing_exported_names": [
+            "resolve_policy_model_name"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.base",
+          "names": [
+            "InferenceEngineInterface"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "InferenceEngineInterface"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+          "names": [
+            "get_sampling_params_for_backend"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_sampling_params_for_backend"
+          ]
+        }
+      ]
+    },
+    {
+      "distribution": "skyrl",
+      "version": "0.2.0",
+      "source": "https://pypi.org/pypi/skyrl/0.2.0/json",
+      "requires_python": ">=3.11",
+      "wheel_url": "https://files.pythonhosted.org/packages/9c/6a/5be5171574a9a77744df5e4fa1fbeafac9a627ba5d74037388831d539982/skyrl-0.2.0-py3-none-any.whl",
+      "wheel_sha256": "b55fa24106db4cbdd8f2209b40687f2b7ad33494914299ae91a4a674dcc56c62",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "skyrl-train",
+        "fsdp"
+      ],
+      "requires_dist_for_linux_py312": [
+        "datasets>=4.0.0",
+        "pillow>=11.3.0",
+        "rich>=14.1.0",
+        "safetensors>=0.6.2",
+        "tokenizers>=0.21.2",
+        "transformers<=5.3.0,>=5.0.0",
+        "typer>=0.17.4",
+        "peft",
+        "hf_transfer",
+        "cloudpathlib>=0.23.0",
+        "loguru; extra == \"skyrl-train\"",
+        "tqdm; extra == \"skyrl-train\"",
+        "ninja; extra == \"skyrl-train\"",
+        "tensorboard; extra == \"skyrl-train\"",
+        "func_timeout; extra == \"skyrl-train\"",
+        "hydra-core==1.3.2; extra == \"skyrl-train\"",
+        "accelerate; extra == \"skyrl-train\"",
+        "torchdata; extra == \"skyrl-train\"",
+        "omegaconf; extra == \"skyrl-train\"",
+        "ray==2.51.1; extra == \"skyrl-train\"",
+        "peft; extra == \"skyrl-train\"",
+        "debugpy==1.8.0; extra == \"skyrl-train\"",
+        "hf_transfer; extra == \"skyrl-train\"",
+        "wandb; extra == \"skyrl-train\"",
+        "datasets>=4.0.0; extra == \"skyrl-train\"",
+        "tensordict; extra == \"skyrl-train\"",
+        "jaxtyping; extra == \"skyrl-train\"",
+        "skyrl-gym==0.3.0; extra == \"skyrl-train\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "polars; extra == \"skyrl-train\"",
+        "s3fs; extra == \"skyrl-train\"",
+        "fastapi; extra == \"skyrl-train\"",
+        "uvicorn; extra == \"skyrl-train\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "pybind11; extra == \"skyrl-train\"",
+        "setuptools; extra == \"skyrl-train\"",
+        "nixl; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "skyrl[skyrl-train]; extra == \"fsdp\"",
+        "vllm==0.19.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "nixl; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-linear-attention; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "causal-conv1d; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torch==2.10.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-python==0.6.6; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-jit-cache==0.6.6; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "torchvision; sys_platform == \"linux\" and extra == \"fsdp\""
+      ],
+      "missing_imports": [
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+          "names": [
+            "resolve_policy_model_name"
+          ],
+          "module_exists": true,
+          "missing_exported_names": [
+            "resolve_policy_model_name"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.base",
+          "names": [
+            "InferenceEngineInterface"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "InferenceEngineInterface"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+          "names": [
+            "get_sampling_params_for_backend"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_sampling_params_for_backend"
+          ]
+        }
+      ]
+    },
+    {
+      "distribution": "skyrl",
+      "version": "0.3.0",
+      "source": "https://pypi.org/pypi/skyrl/0.3.0/json",
+      "requires_python": ">=3.11",
+      "wheel_url": "https://files.pythonhosted.org/packages/79/0f/c89d23009539945c0e75ae428bf25363ca5b24a70e0aabe3377367de03a4/skyrl-0.3.0-py3-none-any.whl",
+      "wheel_sha256": "0110e9434a58d6eb2aa533dd06e6346c8303757800af3c2b5a0d3f341cbad414",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "skyrl-train",
+        "fsdp"
+      ],
+      "requires_dist_for_linux_py312": [
+        "datasets>=4.0.0",
+        "pillow>=11.3.0",
+        "rich>=14.1.0",
+        "safetensors>=0.6.2",
+        "tokenizers>=0.21.2",
+        "transformers<=5.8.0,>=5.6.1",
+        "typer>=0.17.4",
+        "peft==0.18.1",
+        "hf_transfer",
+        "cloudpathlib>=0.23.0",
+        "loguru; extra == \"skyrl-train\"",
+        "tqdm; extra == \"skyrl-train\"",
+        "ninja; extra == \"skyrl-train\"",
+        "tensorboard; extra == \"skyrl-train\"",
+        "func_timeout; extra == \"skyrl-train\"",
+        "hydra-core==1.3.2; extra == \"skyrl-train\"",
+        "accelerate; extra == \"skyrl-train\"",
+        "torchdata; extra == \"skyrl-train\"",
+        "omegaconf; extra == \"skyrl-train\"",
+        "ray==2.56.0; extra == \"skyrl-train\"",
+        "peft==0.18.1; extra == \"skyrl-train\"",
+        "debugpy==1.8.0; extra == \"skyrl-train\"",
+        "hf_transfer; extra == \"skyrl-train\"",
+        "wandb; extra == \"skyrl-train\"",
+        "datasets>=4.0.0; extra == \"skyrl-train\"",
+        "tensordict; extra == \"skyrl-train\"",
+        "jaxtyping; extra == \"skyrl-train\"",
+        "skyrl-gym==0.4.0; extra == \"skyrl-train\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "polars; extra == \"skyrl-train\"",
+        "s3fs; extra == \"skyrl-train\"",
+        "fastapi; extra == \"skyrl-train\"",
+        "uvicorn; extra == \"skyrl-train\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "pybind11; extra == \"skyrl-train\"",
+        "setuptools; extra == \"skyrl-train\"",
+        "nixl; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "skyrl[skyrl-train]; extra == \"fsdp\"",
+        "vllm==0.23.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "nixl; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-linear-attention; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "causal-conv1d; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torch==2.11.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-python==0.6.12; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-jit-cache==0.6.12; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-cubin==0.6.12; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "torchvision; sys_platform == \"linux\" and extra == \"fsdp\""
+      ],
+      "missing_imports": []
+    },
+    {
+      "distribution": "skyrl",
+      "version": "0.4.0",
+      "source": "https://pypi.org/pypi/skyrl/0.4.0/json",
+      "requires_python": "<3.15,>=3.12",
+      "wheel_url": "https://files.pythonhosted.org/packages/cd/cd/edf30a13a51359f6ff2f07a6897bce8f57e67651022fc3ae84e35ed10c58/skyrl-0.4.0-py3-none-any.whl",
+      "wheel_sha256": "7f95dad660ddc388ca135a1faf61bcbd8010a39e3d4fef92c62959c0353c6ee9",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "skyrl-train",
+        "fsdp"
+      ],
+      "requires_dist_for_linux_py312": [
+        "datasets>=4.0.0",
+        "pillow>=11.3.0",
+        "rich>=14.1.0",
+        "safetensors>=0.6.2",
+        "tokenizers>=0.23.1",
+        "transformers<=5.16.1,>=5.6.1",
+        "typer>=0.17.4",
+        "peft==0.18.1",
+        "hf_transfer",
+        "cloudpathlib>=0.23.0",
+        "zstandard>=0.23.0",
+        "xxhash>=3.0.0",
+        "loguru; extra == \"skyrl-train\"",
+        "tqdm; extra == \"skyrl-train\"",
+        "ninja; extra == \"skyrl-train\"",
+        "tensorboard; extra == \"skyrl-train\"",
+        "func_timeout; extra == \"skyrl-train\"",
+        "hydra-core==1.3.4; extra == \"skyrl-train\"",
+        "accelerate; extra == \"skyrl-train\"",
+        "torchdata; extra == \"skyrl-train\"",
+        "omegaconf; extra == \"skyrl-train\"",
+        "ray==2.57.0; extra == \"skyrl-train\"",
+        "peft==0.18.1; extra == \"skyrl-train\"",
+        "debugpy==1.8.0; extra == \"skyrl-train\"",
+        "hf_transfer; extra == \"skyrl-train\"",
+        "wandb; extra == \"skyrl-train\"",
+        "datasets>=4.0.0; extra == \"skyrl-train\"",
+        "tensordict; extra == \"skyrl-train\"",
+        "jaxtyping; extra == \"skyrl-train\"",
+        "skyrl-gym; extra == \"skyrl-train\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "polars; extra == \"skyrl-train\"",
+        "s3fs; extra == \"skyrl-train\"",
+        "s5cmd>=0.3.3; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "gcsfs; extra == \"skyrl-train\"",
+        "fastapi; extra == \"skyrl-train\"",
+        "orjson>=3.11.9; extra == \"skyrl-train\"",
+        "pybase64>=1.4.2; extra == \"skyrl-train\"",
+        "uvicorn; extra == \"skyrl-train\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "pybind11; extra == \"skyrl-train\"",
+        "setuptools; extra == \"skyrl-train\"",
+        "nixl; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "skyrl[skyrl-train]; extra == \"fsdp\"",
+        "vllm==0.30.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "nixl; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-linear-attention; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "causal-conv1d==1.6.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-attn==2.8.3; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torch==2.13.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-python==0.6.18.post1; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-jit-cache==0.6.18.post1; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "flashinfer-cubin==0.6.18.post1; (sys_platform == \"linux\" and platform_machine == \"x86_64\") and extra == \"fsdp\"",
+        "torchvision; sys_platform == \"linux\" and extra == \"fsdp\""
+      ],
+      "missing_imports": []
+    },
+    {
+      "distribution": "skyrl",
+      "version": "0.5.0",
+      "source": "https://pypi.org/pypi/skyrl/0.5.0/json",
+      "requires_python": "<3.15,>=3.12",
+      "wheel_url": "https://files.pythonhosted.org/packages/b2/14/8f5d8fa5e1a0624bb6f99a6f2017e922104f800a6046031e4884d79b4265/skyrl-0.5.0-py3-none-any.whl",
+      "wheel_sha256": "25105933b723084a5bac1b28123b386915b32648b22ca2f0ab94250d25fbf76e",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "skyrl-train",
+        "fsdp"
+      ],
+      "requires_dist_for_linux_py312": [
+        "datasets>=4.0.0",
+        "pillow>=11.3.0",
+        "rich>=14.1.0",
+        "safetensors>=0.6.2",
+        "tokenizers>=0.23.1",
+        "transformers<=5.16.1,>=5.6.1",
+        "typer>=0.17.4",
+        "peft==0.21.0",
+        "hf_transfer",
+        "cloudpathlib>=0.23.0",
+        "zstandard>=0.23.0",
+        "xxhash>=3.0.0",
+        "loguru; extra == \"skyrl-train\"",
+        "tqdm; extra == \"skyrl-train\"",
+        "ninja; extra == \"skyrl-train\"",
+        "tensorboard; extra == \"skyrl-train\"",
+        "func_timeout; extra == \"skyrl-train\"",
+        "hydra-core==1.3.4; extra == \"skyrl-train\"",
+        "accelerate; extra == \"skyrl-train\"",
+        "torchdata; extra == \"skyrl-train\"",
+        "omegaconf; extra == \"skyrl-train\"",
+        "ray==2.57.0; extra == \"skyrl-train\"",
+        "peft==0.21.0; extra == \"skyrl-train\"",
+        "debugpy==1.8.0; extra == \"skyrl-train\"",
+        "hf_transfer; extra == \"skyrl-train\"",
+        "wandb; extra == \"skyrl-train\"",
+        "datasets>=4.0.0; extra == \"skyrl-train\"",
+        "tensordict; extra == \"skyrl-train\"",
+        "jaxtyping; extra == \"skyrl-train\"",
+        "skyrl-gym; extra == \"skyrl-train\"",
+        "flash-attn==2.8.3.post1; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "polars; extra == \"skyrl-train\"",
+        "s3fs; extra == \"skyrl-train\"",
+        "s5cmd>=0.3.3; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "gcsfs; extra == \"skyrl-train\"",
+        "fastapi; extra == \"skyrl-train\"",
+        "orjson>=3.11.9; extra == \"skyrl-train\"",
+        "pybase64>=1.4.2; extra == \"skyrl-train\"",
+        "uvicorn; extra == \"skyrl-train\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "pybind11; extra == \"skyrl-train\"",
+        "setuptools; extra == \"skyrl-train\"",
+        "nixl>=1.5.0; sys_platform == \"linux\" and extra == \"skyrl-train\"",
+        "skyrl[skyrl-train]; extra == \"fsdp\"",
+        "vllm==0.33.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "vllm-router; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "nixl>=1.5.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-linear-attention==0.6.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "causal-conv1d==1.7.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flash-attn==2.8.3.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torch==2.14.0; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-python==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm100a==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm103a==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm120f==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm80==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm89==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-jit-cache-sm90a==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "flashinfer-cubin==0.7.2.post1; sys_platform == \"linux\" and extra == \"fsdp\"",
+        "torchvision; sys_platform == \"linux\" and extra == \"fsdp\""
+      ],
+      "missing_imports": []
+    },
+    {
+      "distribution": "skyrl-train",
+      "version": "0.1.0",
+      "source": "https://pypi.org/pypi/skyrl-train/0.1.0/json",
+      "requires_python": "==3.12.*",
+      "wheel_url": "https://files.pythonhosted.org/packages/82/66/95424ffa45f5faa8d4d101b83ae2363f6a06589d8611b33c56de3e232f51/skyrl_train-0.1.0-py3-none-any.whl",
+      "wheel_sha256": "d8240aa1db8dc9c98d8cee03e661701fa8bfdd5e5918fb8a328190d95642e0a6",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "vllm"
+      ],
+      "requires_dist_for_linux_py312": [
+        "loguru",
+        "tqdm",
+        "tensorboard",
+        "func_timeout",
+        "transformers>=4.51.0",
+        "hydra-core==1.3.2",
+        "accelerate",
+        "torchdata",
+        "omegaconf",
+        "ray==2.48.0",
+        "peft",
+        "debugpy==1.8.0",
+        "hf_transfer",
+        "wandb",
+        "datasets",
+        "tensordict",
+        "jaxtyping",
+        "skyrl-gym",
+        "flash-attn",
+        "vllm==0.9.2; extra == \"vllm\"",
+        "torch==2.7.0; extra == \"vllm\"",
+        "flashinfer-python; extra == \"vllm\"",
+        "torchvision; extra == \"vllm\""
+      ],
+      "missing_imports": [
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+          "names": [
+            "resolve_policy_model_name"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "resolve_policy_model_name"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "get_rollout_metrics"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_rollout_metrics"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.base",
+          "names": [
+            "InferenceEngineInterface"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "InferenceEngineInterface"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.entrypoints.main_base",
+          "names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "initialize_ray"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "initialize_ray"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.trainer",
+          "names": [
+            "RayPPOTrainer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "RayPPOTrainer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+          "names": [
+            "get_sampling_params_for_backend"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_sampling_params_for_backend"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.dataset",
+          "names": [
+            "PromptDataset"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "PromptDataset"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "SkyRLTrainConfig"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "SkyRLTrainConfig"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.training_batch",
+          "names": [
+            "TrainingInputBatch"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "TrainingInputBatch"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "Timer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "Timer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "get_kl_controller"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_kl_controller"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils.trainer_utils",
+          "names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "register_advantage_estimator"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "register_advantage_estimator"
+          ]
+        }
+      ]
+    },
+    {
+      "distribution": "skyrl-train",
+      "version": "0.2.0",
+      "source": "https://pypi.org/pypi/skyrl-train/0.2.0/json",
+      "requires_python": "==3.12.*",
+      "wheel_url": "https://files.pythonhosted.org/packages/e8/43/6940bf49ef0215eb04cef7828bf6f0cef12adfdbb3dd2c31c66e80dc919a/skyrl_train-0.2.0-py3-none-any.whl",
+      "wheel_sha256": "d20317886a3744e6c31f1cd69ed8888f4947931b590fb0c6b7562b124f049294",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "vllm"
+      ],
+      "requires_dist_for_linux_py312": [
+        "loguru",
+        "tqdm",
+        "tensorboard",
+        "func_timeout",
+        "transformers>=4.51.0",
+        "hydra-core==1.3.2",
+        "accelerate",
+        "torchdata",
+        "omegaconf",
+        "ray==2.48.0",
+        "peft",
+        "debugpy==1.8.0",
+        "hf_transfer",
+        "wandb",
+        "datasets==4.0.0",
+        "tensordict",
+        "jaxtyping",
+        "skyrl-gym",
+        "flash-attn",
+        "polars",
+        "s3fs",
+        "vllm==0.10.1.1; extra == \"vllm\"",
+        "torch==2.7.1; extra == \"vllm\"",
+        "flashinfer-python; extra == \"vllm\"",
+        "torchvision; extra == \"vllm\""
+      ],
+      "missing_imports": [
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+          "names": [
+            "resolve_policy_model_name"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "resolve_policy_model_name"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "get_rollout_metrics"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_rollout_metrics"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.base",
+          "names": [
+            "InferenceEngineInterface"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "InferenceEngineInterface"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.entrypoints.main_base",
+          "names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "initialize_ray"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "initialize_ray"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.trainer",
+          "names": [
+            "RayPPOTrainer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "RayPPOTrainer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+          "names": [
+            "get_sampling_params_for_backend"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_sampling_params_for_backend"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.dataset",
+          "names": [
+            "PromptDataset"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "PromptDataset"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "SkyRLTrainConfig"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "SkyRLTrainConfig"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.training_batch",
+          "names": [
+            "TrainingInputBatch"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "TrainingInputBatch"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "Timer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "Timer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "get_kl_controller"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_kl_controller"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils.trainer_utils",
+          "names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "register_advantage_estimator"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "register_advantage_estimator"
+          ]
+        }
+      ]
+    },
+    {
+      "distribution": "skyrl-train",
+      "version": "0.3.1",
+      "source": "https://pypi.org/pypi/skyrl-train/0.3.1/json",
+      "requires_python": "==3.12.*",
+      "wheel_url": "https://files.pythonhosted.org/packages/36/20/60f75d0c9a55386a7efabf3b32e5bddfcd44e587334e4cdd2002c8d534cc/skyrl_train-0.3.1-py3-none-any.whl",
+      "wheel_sha256": "981cd57d3e1affaa0e9abc3402d35cd76d8fff566e8ac04eb66d3a5f104c2a63",
+      "wheel_sha256_verified": true,
+      "selected_extras": [
+        "vllm"
+      ],
+      "requires_dist_for_linux_py312": [
+        "loguru",
+        "tqdm",
+        "ninja",
+        "tensorboard",
+        "func_timeout",
+        "transformers>=4.51.0",
+        "hydra-core==1.3.2",
+        "accelerate",
+        "torchdata",
+        "omegaconf",
+        "ray==2.51.1",
+        "peft",
+        "debugpy==1.8.0",
+        "hf_transfer",
+        "wandb",
+        "datasets==4.0.0",
+        "tensordict",
+        "jaxtyping",
+        "skyrl-gym",
+        "flash-attn",
+        "polars",
+        "s3fs",
+        "fastapi",
+        "uvicorn",
+        "pybind11",
+        "setuptools",
+        "vllm==0.11.0; extra == \"vllm\"",
+        "flash-attn==2.8.3; extra == \"vllm\"",
+        "torch==2.8.0; extra == \"vllm\"",
+        "flashinfer-python; extra == \"vllm\"",
+        "flashinfer-jit-cache; extra == \"vllm\"",
+        "torchvision; extra == \"vllm\""
+      ],
+      "missing_imports": [
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.utils",
+          "names": [
+            "resolve_policy_model_name"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "resolve_policy_model_name"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_backend.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "get_rollout_metrics"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_rollout_metrics"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorConfig",
+            "SkyRLTrainConfig",
+            "make_config"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInterface",
+            "GeneratorInput",
+            "GeneratorOutput"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.base",
+          "names": [
+            "InferenceEngineInterface"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "InferenceEngineInterface"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.entrypoints.main_base",
+          "names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "BasePPOExp",
+            "config_dir",
+            "validate_cfg"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/skyrl_train_main.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "initialize_ray"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "initialize_ray"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.trainer",
+          "names": [
+            "RayPPOTrainer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "RayPPOTrainer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.base",
+          "names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "GeneratorInput",
+            "GeneratorOutput",
+            "TrajectoryID",
+            "BatchMetadata",
+            "TrainingPhase"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.inference_servers.engine_utils",
+          "names": [
+            "get_sampling_params_for_backend"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_sampling_params_for_backend"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.dataset",
+          "names": [
+            "PromptDataset"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "PromptDataset"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.config",
+          "names": [
+            "SkyRLTrainConfig"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "SkyRLTrainConfig"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.training_batch",
+          "names": [
+            "TrainingInputBatch"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "TrainingInputBatch"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.generators.utils",
+          "names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "prepare_generator_input",
+            "get_metrics_from_generator_output"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils",
+          "names": [
+            "Timer"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "Timer"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "get_kl_controller"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "get_kl_controller"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.train.utils.trainer_utils",
+          "names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "validate_generator_output",
+            "ResumeMode",
+            "build_dataloader",
+            "calculate_per_dataset_metrics",
+            "dump_per_dataset_eval_results",
+            "concatenate_generator_outputs"
+          ]
+        },
+        {
+          "file": "loom/integrations/skyrl_train/trainer.py",
+          "module": "skyrl.backends.skyrl_train.utils.ppo_utils",
+          "names": [
+            "register_advantage_estimator"
+          ],
+          "module_exists": false,
+          "missing_exported_names": [
+            "register_advantage_estimator"
+          ]
+        }
+      ]
+    }
+  ],
+  "vllm_dependency_metadata": [
+    {
+      "version": "0.9.2",
+      "source": "https://pypi.org/pypi/vllm/0.9.2/json",
+      "requires_python": "<3.13,>=3.9",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers>=4.51.1",
+        "huggingface-hub[hf_xet]>=0.33.0",
+        "tokenizers>=0.21.1",
+        "protobuf",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp",
+        "openai<=1.90.0,>=1.52.0",
+        "pydantic>=2.10",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer<0.11,>=0.10.11",
+        "llguidance<0.8.0,>=0.7.11; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\"",
+        "outlines==0.1.11",
+        "lark==1.2.2",
+        "xgrammar==0.1.19; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.13.0",
+        "importlib_metadata; python_version < \"3.10\"",
+        "mistral_common[opencv]>=1.6.2",
+        "opencv-python-headless>=4.11.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<80,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.10.2",
+        "depyf==0.18.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "scipy",
+        "ninja",
+        "pybase64",
+        "numba==0.60.0; python_version == \"3.9\"",
+        "numba==0.61.2; python_version > \"3.9\"",
+        "ray[cgraph]!=2.44.*,>=2.43.0",
+        "torch==2.7.0",
+        "torchaudio==2.7.0",
+        "torchvision==0.22.0",
+        "xformers==0.0.30; platform_system == \"Linux\" and platform_machine == \"x86_64\"",
+        "pandas; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "tensorizer>=2.9.0; extra == \"tensorizer\"",
+        "fastsafetensors>=0.1.10; extra == \"fastsafetensors\"",
+        "runai-model-streamer; extra == \"runai\"",
+        "runai-model-streamer-s3; extra == \"runai\"",
+        "boto3; extra == \"runai\"",
+        "librosa; extra == \"audio\"",
+        "soundfile; extra == \"audio\""
+      ]
+    },
+    {
+      "version": "0.10.1.1",
+      "source": "https://pypi.org/pypi/vllm/0.10.1.1/json",
+      "requires_python": "<3.13,>=3.9",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers>=4.55.0",
+        "tokenizers>=0.21.1",
+        "protobuf",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp",
+        "openai>=1.99.1",
+        "pydantic>=2.10",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer<0.11,>=0.10.11",
+        "llguidance<0.8.0,>=0.7.11; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\"",
+        "outlines_core==0.2.10",
+        "diskcache==5.6.3",
+        "lark==1.2.2",
+        "xgrammar==0.1.21; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.13.0",
+        "importlib_metadata; python_version < \"3.10\"",
+        "mistral_common[audio,image]>=1.8.2",
+        "opencv-python-headless>=4.11.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<80,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.10.2",
+        "depyf==0.19.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "scipy",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "numba==0.60.0; python_version == \"3.9\"",
+        "numba==0.61.2; python_version > \"3.9\"",
+        "ray[cgraph]>=2.48.0",
+        "torch==2.7.1",
+        "torchaudio==2.7.1",
+        "torchvision==0.22.1",
+        "xformers==0.0.31; platform_system == \"Linux\" and platform_machine == \"x86_64\"",
+        "pandas; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.1.10; extra == \"fastsafetensors\"",
+        "runai-model-streamer>=0.13.3; extra == \"runai\"",
+        "runai-model-streamer-s3; extra == \"runai\"",
+        "boto3; extra == \"runai\"",
+        "librosa; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "flashinfer-python==0.2.11; extra == \"flashinfer\""
+      ]
+    },
+    {
+      "version": "0.11.0",
+      "source": "https://pypi.org/pypi/vllm/0.11.0/json",
+      "requires_python": "<3.14,>=3.9",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers>=4.55.2",
+        "tokenizers>=0.21.1",
+        "protobuf",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp",
+        "openai>=1.99.1",
+        "pydantic>=2.11.7",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<0.8.0,>=0.7.11; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\"",
+        "outlines_core==0.2.11",
+        "diskcache==5.6.3",
+        "lark==1.2.2",
+        "xgrammar==0.1.25; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.13.0",
+        "importlib_metadata; python_version < \"3.10\"",
+        "mistral_common[audio,image]>=1.8.2",
+        "opencv-python-headless>=4.11.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<80,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.11.0",
+        "depyf==0.19.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "scipy",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "numba==0.60.0; python_version == \"3.9\"",
+        "numba==0.61.2; python_version > \"3.9\"",
+        "ray[cgraph]>=2.48.0",
+        "torch==2.8.0",
+        "torchaudio==2.8.0",
+        "torchvision==0.23.0",
+        "xformers==0.0.32.post1; platform_system == \"Linux\" and platform_machine == \"x86_64\"",
+        "pandas; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.1.10; extra == \"fastsafetensors\"",
+        "runai-model-streamer>=0.14.0; extra == \"runai\"",
+        "runai-model-streamer-gcs; extra == \"runai\"",
+        "google-cloud-storage; extra == \"runai\"",
+        "runai-model-streamer-s3; extra == \"runai\"",
+        "boto3; extra == \"runai\"",
+        "librosa; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "flashinfer-python==0.3.1; extra == \"flashinfer\"",
+        "petit-kernel; extra == \"petit-kernel\""
+      ]
+    },
+    {
+      "version": "0.16.0",
+      "source": "https://pypi.org/pypi/vllm/0.16.0/json",
+      "requires_python": "<3.14,>=3.10",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers<5,>=4.56.0",
+        "tokenizers>=0.21.1",
+        "protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp>=3.13.3",
+        "openai>=1.99.1",
+        "pydantic>=2.12.0",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<1.4.0,>=1.3.0; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "outlines_core==0.2.11",
+        "diskcache==5.6.3",
+        "lark==1.2.2",
+        "xgrammar==0.1.29; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.17.0",
+        "mistral_common[image]>=1.9.0",
+        "opencv-python-headless>=4.13.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<81.0.0,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.13.0",
+        "depyf==0.20.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "ijson",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "anthropic>=0.71.0",
+        "model-hosting-container-standards<1.0.0,>=0.1.13",
+        "mcp",
+        "grpcio",
+        "grpcio-reflection",
+        "numba==0.61.2",
+        "ray[cgraph]>=2.48.0",
+        "torch==2.9.1",
+        "torchaudio==2.9.1",
+        "torchvision==0.24.1",
+        "flashinfer-python==0.6.3",
+        "pandas; extra == \"bench\"",
+        "matplotlib; extra == \"bench\"",
+        "seaborn; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "scipy; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.2.2; extra == \"fastsafetensors\"",
+        "runai-model-streamer[gcs,s3]>=0.15.3; extra == \"runai\"",
+        "librosa; extra == \"audio\"",
+        "scipy; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "petit-kernel; extra == \"petit-kernel\"",
+        "helion; extra == \"helion\"",
+        "opentelemetry-sdk>=1.26.0; extra == \"otel\"",
+        "opentelemetry-api>=1.26.0; extra == \"otel\"",
+        "opentelemetry-exporter-otlp>=1.26.0; extra == \"otel\"",
+        "opentelemetry-semantic-conventions-ai>=0.4.1; extra == \"otel\""
+      ]
+    },
+    {
+      "version": "0.19.0",
+      "source": "https://pypi.org/pypi/vllm/0.19.0/json",
+      "requires_python": "<3.14,>=3.10",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers<5,>=4.56.0",
+        "tokenizers>=0.21.1",
+        "protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp>=3.13.3",
+        "openai>=2.0.0",
+        "pydantic>=2.12.0",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<1.4.0,>=1.3.0; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "outlines_core==0.2.11",
+        "diskcache==5.6.3",
+        "lark==1.2.2",
+        "xgrammar<1.0.0,>=0.1.32; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.17.0",
+        "mistral_common[image]>=1.10.0",
+        "opencv-python-headless>=4.13.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<81.0.0,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.14.0.1",
+        "depyf==0.20.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "ijson",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "anthropic>=0.71.0",
+        "model-hosting-container-standards<1.0.0,>=0.1.13",
+        "mcp",
+        "opentelemetry-sdk>=1.27.0",
+        "opentelemetry-api>=1.27.0",
+        "opentelemetry-exporter-otlp>=1.27.0",
+        "opentelemetry-semantic-conventions-ai>=0.4.1",
+        "numba==0.61.2",
+        "torch==2.10.0",
+        "torchaudio==2.10.0",
+        "torchvision==0.25.0",
+        "flashinfer-python==0.6.6",
+        "flashinfer-cubin==0.6.6",
+        "nvidia-cudnn-frontend<1.19.0,>=1.13.0",
+        "nvidia-cutlass-dsl>=4.4.0.dev1",
+        "quack-kernels>=0.2.7",
+        "zentorch; extra == \"zen\"",
+        "pandas; extra == \"bench\"",
+        "matplotlib; extra == \"bench\"",
+        "seaborn; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "scipy; extra == \"bench\"",
+        "plotly; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.2.2; extra == \"fastsafetensors\"",
+        "instanttensor>=0.1.5; extra == \"instanttensor\"",
+        "runai-model-streamer[azure,gcs,s3]>=0.15.7; extra == \"runai\"",
+        "av; extra == \"audio\"",
+        "resampy; extra == \"audio\"",
+        "scipy; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "petit-kernel; extra == \"petit-kernel\"",
+        "helion==0.3.2; extra == \"helion\"",
+        "smg-grpc-servicer[vllm]>=0.5.0; extra == \"grpc\"",
+        "opentelemetry-sdk>=1.26.0; extra == \"otel\"",
+        "opentelemetry-api>=1.26.0; extra == \"otel\"",
+        "opentelemetry-exporter-otlp>=1.26.0; extra == \"otel\"",
+        "opentelemetry-semantic-conventions-ai>=0.4.1; extra == \"otel\""
+      ]
+    },
+    {
+      "version": "0.23.0",
+      "source": "https://pypi.org/pypi/vllm/0.23.0/json",
+      "requires_python": "<3.15,>=3.10",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers!=5.0.*,!=5.1.*,!=5.2.*,!=5.3.*,!=5.4.*,!=5.5.0,>=4.56.0",
+        "tokenizers>=0.21.1",
+        "safetensors>=0.6.2",
+        "protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6",
+        "fastapi[standard]>=0.115.0",
+        "aiohttp>=3.13.3",
+        "openai>=2.0.0",
+        "pydantic>=2.12.0",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=7.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<1.8.0,>=1.7.0; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\"",
+        "outlines_core==0.2.14",
+        "diskcache==5.6.3",
+        "lark==1.2.2",
+        "xgrammar<1.0.0,>=0.2.0; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "gguf>=0.17.0",
+        "mistral_common[image]>=1.11.3",
+        "opencv-python-headless>=4.13.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<81.0.0,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.17.0",
+        "depyf==0.20.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "ijson",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "anthropic>=0.71.0",
+        "model-hosting-container-standards<1.0.0,>=0.1.14",
+        "mcp",
+        "opentelemetry-sdk>=1.27.0",
+        "opentelemetry-api>=1.27.0",
+        "opentelemetry-exporter-otlp>=1.27.0",
+        "opentelemetry-semantic-conventions-ai>=0.4.1",
+        "numba==0.65.0",
+        "torch==2.11.0",
+        "torchaudio==2.11.0",
+        "torchvision==0.26.0",
+        "flashinfer-python==0.6.12",
+        "flashinfer-cubin==0.6.12",
+        "apache-tvm-ffi==0.1.9",
+        "tilelang==0.1.9",
+        "nvidia-cudnn-frontend>=1.19.1",
+        "fastsafetensors>=0.3.2",
+        "nvidia-cutlass-dsl[cu13]==4.5.2",
+        "quack-kernels>=0.3.3",
+        "tokenspeed-mla==0.1.2",
+        "humming-kernels[cu13]==0.1.4",
+        "zentorch==2.11.0.0; extra == \"zen\"",
+        "pandas; extra == \"bench\"",
+        "matplotlib; extra == \"bench\"",
+        "seaborn; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "scipy; extra == \"bench\"",
+        "plotly; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.3.2; extra == \"fastsafetensors\"",
+        "instanttensor>=0.1.5; extra == \"instanttensor\"",
+        "runai-model-streamer[azure,gcs,s3]>=0.15.7; extra == \"runai\"",
+        "av; extra == \"audio\"",
+        "scipy; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "helion==1.0.0; extra == \"helion\"",
+        "smg-grpc-servicer[vllm]>=0.5.2; extra == \"grpc\"",
+        "opentelemetry-sdk>=1.26.0; extra == \"otel\"",
+        "opentelemetry-api>=1.26.0; extra == \"otel\"",
+        "opentelemetry-exporter-otlp>=1.26.0; extra == \"otel\"",
+        "opentelemetry-semantic-conventions-ai>=0.4.1; extra == \"otel\""
+      ]
+    },
+    {
+      "version": "0.30.0",
+      "source": "https://pypi.org/pypi/vllm/0.30.0/json",
+      "requires_python": "<3.15,>=3.10",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.26.0",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers>=5.10.4",
+        "huggingface_hub>=1.31.0",
+        "tokenizers>=0.21.1",
+        "safetensors>=0.6.2",
+        "protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6",
+        "fastapi[standard]<0.137.0,>=0.133.0",
+        "starlette>=1.0.1",
+        "aiohttp>=3.13.3",
+        "openai>=2.25.0",
+        "pydantic>=2.12.0",
+        "prometheus_client>=0.18.0",
+        "pillow",
+        "prometheus-fastapi-instrumentator>=8.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<1.8.0,>=1.7.0; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"s390x\"",
+        "outlines_core==0.2.14",
+        "lark==1.2.2",
+        "xgrammar<1.0.0,>=0.2.1; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.16.1",
+        "partial-json-parser",
+        "jsonschema>=4.23.0",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "mistral_common[image]>=1.11.6",
+        "opencv-python-headless>=4.13.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<81.0.0,>=77.0.3; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.17.0",
+        "depyf==0.20.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "ijson",
+        "setproctitle",
+        "openai-harmony>=0.0.3",
+        "anthropic>=0.71.0",
+        "model-hosting-container-standards<1.0.0,>=0.1.14",
+        "mcp<3.0.0,>=2.0.0",
+        "opentelemetry-sdk>=1.27.0",
+        "opentelemetry-api>=1.27.0",
+        "opentelemetry-exporter-otlp>=1.27.0",
+        "opentelemetry-semantic-conventions-ai>=0.4.1",
+        "numba==0.65.0",
+        "torch==2.13.0",
+        "torchaudio==2.11.0",
+        "torchvision==0.28.0",
+        "torchcodec>=0.14",
+        "PyNvVideoCodec==2.0.4",
+        "flashinfer-python==0.6.18.post1",
+        "apache-tvm-ffi==0.1.11",
+        "tilelang==0.1.12",
+        "nvidia-cudnn-frontend>=1.19.1",
+        "nvtx==0.2.15",
+        "fastsafetensors>=0.3.3",
+        "instanttensor>=0.1.9",
+        "nvidia-cutlass-dsl[cu13]==4.7.1",
+        "quack-kernels==0.6.5",
+        "tokenspeed-mla==0.1.8; platform_system == \"Linux\"",
+        "humming-kernels[cu13]==0.1.12",
+        "zentorch==2.13.0.0; extra == \"zen\"",
+        "pandas; extra == \"bench\"",
+        "matplotlib; extra == \"bench\"",
+        "seaborn; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "scipy; extra == \"bench\"",
+        "plotly; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.3.3; extra == \"fastsafetensors\"",
+        "instanttensor>=0.1.9; extra == \"instanttensor\"",
+        "runai-model-streamer[azure,gcs,s3]>=0.15.7; extra == \"runai\"",
+        "av; extra == \"audio\"",
+        "scipy; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "soxr; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "nvidia-deepstream-videodecode-cu13>=9.0.2; extra == \"deepstream\"",
+        "b12x==1.3.0; extra == \"b12x\"",
+        "helion==1.4.0; extra == \"helion\"",
+        "smg-grpc-servicer[vllm]>=0.5.2; extra == \"grpc\"",
+        "opentelemetry-sdk>=1.26.0; extra == \"otel\"",
+        "opentelemetry-api>=1.26.0; extra == \"otel\"",
+        "opentelemetry-exporter-otlp>=1.26.0; extra == \"otel\"",
+        "opentelemetry-semantic-conventions-ai>=0.4.1; extra == \"otel\"",
+        "vllm-gguf-plugin>=0.0.2; extra == \"extra-quant\""
+      ]
+    },
+    {
+      "version": "0.33.0",
+      "source": "https://pypi.org/pypi/vllm/0.33.0/json",
+      "requires_python": "<3.15,>=3.11",
+      "requires_dist": [
+        "regex",
+        "cachetools",
+        "psutil",
+        "sentencepiece",
+        "numpy",
+        "requests>=2.33.0",
+        "certifi>=2026.10.19",
+        "tqdm",
+        "blake3",
+        "py-cpuinfo",
+        "transformers<5.21.0,>=5.16.1",
+        "huggingface_hub>=1.31.0",
+        "tokenizers>=0.23.2",
+        "safetensors>=0.6.2",
+        "protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6; platform_machine != \"s390x\"",
+        "protobuf==7.36.1; platform_machine == \"s390x\"",
+        "fastapi[standard]<0.137.0,>=0.133.0",
+        "starlette>=1.0.1",
+        "aiohttp>=3.14.4",
+        "multidict>=6.9.1",
+        "openai>=2.25.0",
+        "pydantic>=2.12.0",
+        "orjson>=3.11.6",
+        "prometheus_client>=0.18.0",
+        "pillow>=13.0.0",
+        "prometheus-fastapi-instrumentator>=8.0.0",
+        "tiktoken>=0.6.0",
+        "lm-format-enforcer==0.11.3",
+        "llguidance<1.8.0,>=1.7.0; platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"s390x\"",
+        "outlines_core==0.2.14",
+        "lark==1.2.2",
+        "xgrammar==0.2.8; platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\" or platform_machine == \"s390x\" or platform_machine == \"ppc64le\"",
+        "typing_extensions>=4.10",
+        "filelock>=3.20.3",
+        "partial-json-parser",
+        "jsonschema>=4.23.0",
+        "pyzmq>=25.0.0",
+        "msgspec",
+        "mistral_common[image]>=1.11.6",
+        "opencv-python-headless>=4.13.0",
+        "pyyaml",
+        "six>=1.16.0; python_version > \"3.11\"",
+        "setuptools<81.0.0,>=78.1.1; python_version > \"3.11\"",
+        "einops",
+        "compressed-tensors==0.17.0",
+        "depyf==0.20.0",
+        "cloudpickle",
+        "watchfiles",
+        "python-json-logger",
+        "ninja",
+        "pybase64",
+        "cbor2",
+        "ijson",
+        "setproctitle",
+        "oss-harmony>=0.0.11",
+        "anthropic>=0.71.0",
+        "model-hosting-container-standards<1.0.0,>=0.1.14",
+        "mcp<3.0.0,>=2.2.0",
+        "opentelemetry-sdk>=1.27.0",
+        "opentelemetry-api>=1.27.0",
+        "opentelemetry-exporter-otlp>=1.27.0",
+        "opentelemetry-semantic-conventions-ai>=0.4.1",
+        "numba==0.65.0",
+        "torch==2.14.0",
+        "torchaudio==2.11.0",
+        "torchvision==0.29.0",
+        "torchcodec>=0.14",
+        "PyNvVideoCodec==2.0.4",
+        "flashinfer-python==0.7.2.post1",
+        "apache-tvm-ffi==0.1.11",
+        "tilelang==0.1.12",
+        "nvidia-cudnn-frontend>=1.31.0",
+        "nvtx==0.2.15",
+        "fastsafetensors>=0.3.3",
+        "instanttensor>=0.2.2",
+        "nvidia-cutlass-dsl[cu13]==4.8.0",
+        "quack-kernels==0.6.5",
+        "tokenspeed-mla==2.0.3; platform_system == \"Linux\"",
+        "humming-kernels[cu13]==0.1.19",
+        "zentorch==2.14.0.1; extra == \"zen\"",
+        "pandas; extra == \"bench\"",
+        "matplotlib; extra == \"bench\"",
+        "seaborn; extra == \"bench\"",
+        "datasets; extra == \"bench\"",
+        "scipy; extra == \"bench\"",
+        "plotly; extra == \"bench\"",
+        "tensorizer==2.10.1; extra == \"tensorizer\"",
+        "fastsafetensors>=0.3.3; extra == \"fastsafetensors\"",
+        "instanttensor>=0.2.2; extra == \"instanttensor\"",
+        "runai-model-streamer[azure,gcs,s3]>=0.15.7; extra == \"runai\"",
+        "av; extra == \"audio\"",
+        "scipy; extra == \"audio\"",
+        "soundfile; extra == \"audio\"",
+        "soxr; extra == \"audio\"",
+        "mistral_common[audio]; extra == \"audio\"",
+        "nvidia-deepstream-videodecode-cu13>=9.0.2; extra == \"deepstream\"",
+        "b12x==1.5.1; extra == \"b12x\"",
+        "helion==1.4.0; extra == \"helion\"",
+        "smg-grpc-servicer[vllm]>=0.5.2; extra == \"grpc\"",
+        "opentelemetry-sdk>=1.26.0; extra == \"otel\"",
+        "opentelemetry-api>=1.26.0; extra == \"otel\"",
+        "opentelemetry-exporter-otlp>=1.26.0; extra == \"otel\"",
+        "opentelemetry-semantic-conventions-ai>=0.4.1; extra == \"otel\"",
+        "vllm-gguf-plugin>=0.0.2; extra == \"extra-quant\""
+      ]
+    }
+  ]
+}

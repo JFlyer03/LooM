@@ -170,6 +170,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
             from .verl_async_manager import SkyAgentLoopManager
 
             self.async_rollout_mode = True
+            # # 把verl的rollout管理器替换成 SkyRL-Agent 自己的实现
             self.async_rollout_manager = SkyAgentLoopManager(
                 config=self.config,
                 worker_group=self.actor_rollout_wg,
@@ -447,7 +448,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                         if self.use_rm:
                             self.rm_wg.start_profile()
                 
-                # 训练数据转化为 verl的DataProto
+                # 训练数据转化为 verl 的统一数据格式 DataProto
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
                 if self.global_steps == 1:
                     prompts = self.tokenizer.batch_decode(batch.batch["input_ids"], skip_special_tokens=True)
@@ -494,6 +495,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                         if not self.async_rollout_mode:
                             gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
                         else:
+                            # Rollout 采样
                             gen_batch_output = self.async_rollout_manager.generate_sequences(gen_batch)
                         timing_raw.update(gen_batch_output.meta_info["timing"])
                         gen_batch_output.meta_info.pop("timing", None)

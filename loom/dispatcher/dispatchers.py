@@ -101,8 +101,8 @@ async def async_pipeline_dispatcher(
 # Async Batch Dispatcher
 @register_dispatcher("async_batch")
 async def async_batch_dispatcher(cfg, trajectories: Dict[int, Dict[int, Any]], init_fn: str, run_fn: str, eval_fn: str):
-    max_parallel = cfg["max_parallel_agents"]
-    max_eval_parallel = cfg["max_eval_parallel_agents"]
+    max_parallel = cfg["max_parallel_agents"]               # Agent 轨迹采样并行数
+    max_eval_parallel = cfg["max_eval_parallel_agents"]     # Agent 轨迹评估并行数
     if min(max_parallel, max_eval_parallel) < 1:
         raise ValueError("Trajectory concurrency limits must be positive")
     generation_slots = asyncio.Semaphore(max_parallel)

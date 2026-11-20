@@ -665,6 +665,7 @@ class AgentRunner:
         Returns:
             Results converted to the appropriate output format based on infer backend.
         """
+        # 将不同后端传入的 batch 转换为 AgentRunner 使用的输入
         self.batch = build_generator_input(self.cfg.generator.infer_backend, input_batch).input_batch
 
         if val_mode:
@@ -678,8 +679,12 @@ class AgentRunner:
         if num_trajectories < 1:
             raise ValueError("num_trajectories must be positive")
         self.trajectories = {}
+        
+        # 创建轨迹对象，按“问题 × 轨迹数”创建 ReActTrajectory 对象，并放入 self.trajectories[instance_id][trajectory_id]
         self._initialize_trajectories(val_mode=val_mode)
 
+        # 根据yaml.dispatcher.type 选择 dispatcher，dispatcher 决定这些轨迹如何被调度执行，
+        # 对每条轨迹执行 traj.initialize_trajectory() → traj.generate_trajectory() → traj.evaluate_trajectory()
         generator_dispatcher: DispatcherType | None = DISPATCHER_REGISTRY.get(self.cfg.dispatcher.type)
         if not generator_dispatcher:
             raise ValueError(f"Unknown generator type: {self.cfg.dispatcher.type}")

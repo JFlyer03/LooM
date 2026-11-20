@@ -1,0 +1,36 @@
+# Dedicated dense-model FSDP + vLLM profile for loom-skyrl (installation in progress).
+# shortcut: Llama/Qwen3 only; add upstream GDN/Mamba kernels when those models are needed.
+-r common.txt
+-r storage.txt
+skyrl[skyrl-train]==0.3.0
+torch @ https://download.pytorch.org/whl/cu128/torch-2.11.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl
+torchvision @ https://download.pytorch.org/whl/cu128/torchvision-0.26.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl
+torchaudio @ https://download.pytorch.org/whl/cu128/torchaudio-2.11.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl
+vllm @ https://github.com/vllm-project/vllm/releases/download/v0.23.0/vllm-0.23.0%2Bcu129-cp38-abi3-manylinux_2_28_x86_64.whl
+flash-attn==2.8.3
+cuda-toolkit[nvcc]==12.8.1
+cupy-cuda12x==13.6.0
+transformers==5.8.0
+peft==0.18.1
+ray[default]==2.56.0
+torchdata==0.11.0
+tensordict==0.10.0
+datasets==4.0.0
+# Match datasets' fsspec ceiling and the synchronous/asynchronous S3 clients.
+fsspec==2025.3.0
+s3fs==2025.3.0
+aiobotocore==2.23.0
+boto3==1.38.27
+botocore==1.38.27
+numpy==2.3.5
+pandas==2.3.3
+protobuf==6.33.6
+# Linux glibc 2.28 wheels; NCCL is the weight-sync backend for this profile.
+nixl==0.7.0
+vllm-router==0.1.17
+quack-kernels==0.3.3
+setuptools==80.10.2
+wheel
+uv
+pip
+pytest>=8,<10

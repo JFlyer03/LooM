@@ -38,7 +38,7 @@ fi
 # Set a writable, shared web cache directory for the web_browser tool
 mkdir -p "${SKYAGENT_WEB_CACHE_DIR:-$DATA_DIR/web_cache}" 
 
-uv run --isolated --env-file .env --extra skyrl-train -m loom.integrations.skyrl_train.skyrl_train_main  \
+uv run --no-project --python "$(command -v python)" --env-file .env -m loom.integrations.skyrl_train.skyrl_train_main \
   data.train_data="['$TRAIN_DATA']" \
   data.val_data="['$VAL_DATA']" \
   trainer.algorithm.advantage_estimator="grpo" \

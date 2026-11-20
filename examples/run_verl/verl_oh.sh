@@ -15,7 +15,7 @@ TP_SIZE=4
 # TP_SIZE=2
 
  
- uv run --isolated --frozen --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
+uv run --isolated --locked --extra verl --env-file .env -m loom.integrations.verl.verl_main_ppo \
     algorithm.adv_estimator=loop \
     data.train_files=$train_data \
     data.val_files=$test_data \
@@ -70,7 +70,7 @@ TP_SIZE=4
     trainer.rollout_data_dir=/mnt/local_storage/rollouts/verl_grpo_skyagent/qwen2.5_1.5b_function_rm \
     trainer.validation_data_dir=/mnt/local_storage/rollouts/verl_grpo_skyagent/qwen2.5_1.5b_function_rm_val \
     +loom.task_yaml="./examples/run_verl/verl_oh.yaml" \
-    +loom.num_trajectories=8 $@
+    +loom.num_trajectories=8 "$@"
    #  +trainer.remote_anyscale_upload=True \
    #  +trainer.remote_upload_dir=remote_ckpts/skyagent-32b-r2e-verl/skyagent-verl-30b-r2e-4500-loop-sep27 $@
    #  trainer.resume_from_path=/mnt/local_storage/ckpts/skyagent-32b-r2e-verl/skyagent-verl-32b-r2e-4500-loop-aug20/global_step_14 \
