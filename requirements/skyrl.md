@@ -1,5 +1,33 @@
 # SkyRL-Train 环境依赖调研
 
+## 本机独立环境安装进度（2026-11-22）
+
+已创建 `loom-skyrl`，路径为 `/disk0/home/jiangfeibing/miniconda3/envs/loom-skyrl`。
+已安装 Python 3.12.16、SkyRL 0.3.0、PyTorch 2.11.0+cu128、vLLM 0.23.0+cu129、
+Ray 2.56.0、Transformers 5.8.0；依赖一致性检查和 GPU 0 的 BF16 矩阵运算通过。
+FlashAttention 2.8.3 已使用 CUDA 12.8.93 / GCC 9 为 A100 编译安装，GPU 前向、反向
+及与 PyTorch SDPA 的数值对比通过；LooM SkyRL 入口导入通过。单步训练验证进行中。
+
+SkyRL 0.3.0 的 router 状态日志访问了 vllm-router 0.1.17 不存在的可选字段，
+本环境应用了 [一行兼容补丁](skyrl-router-0.1.17.patch)，使缺失字段按 False 处理。
+该改动只影响状态日志分支。重新安装 SkyRL 后需重新应用此补丁：
+
+```bash
+patch -d "$CONDA_PREFIX/lib/python3.12/site-packages" -p1 < requirements/skyrl-router-0.1.17.patch
+```
+
+依赖输入见 [skyrl-runtime.in](skyrl-runtime.in)，精确版本见
+[skyrl-runtime.lock.txt](skyrl-runtime.lock.txt)。该配置显式补充 dense 模型需要的
+FSDP/vLLM GPU 栈，使用 `skyrl[skyrl-train]`，不安装 `skyrl[fsdp]` 中额外的 GDN/Mamba 内核。
+
+激活命令：`conda activate loom-skyrl`。激活脚本自动设置本环境的 `CUDA_HOME` 和
+`LD_LIBRARY_PATH`、CUDA 头文件/链接路径、GCC 9 编译参数及本机地址的代理绕过列表，
+退出时恢复原值；LooM 源码通过环境内的 `.pth` 文件加载。
+CUDA 12.9 forward-compat 用户态库位于本项目 `.backend-src/cuda-compat-12-9/`，
+不会替换系统 550 驱动。此目录需要保留。
+
+以下为安装前的依赖调研记录。
+
 采集日期：2026-11-19。目标是 LooM 的 FSDP/FSDP2 训练 + vLLM 推理，
 本机驱动 550.90.07、CUDA Toolkit 12.4.131、glibc 2.31、Python 3.12。
 本轮只收集依赖和静态核对接口，没有安装 SkyRL，没有修改 VERL 环境或根项目配置。

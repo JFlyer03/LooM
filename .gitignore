@@ -16,6 +16,8 @@ experiments/*.sh
 oss-backup-current/
 datasets/
 docs/
+中期报告/
+MemFactory/
 
 # Temporary files
 tmp/

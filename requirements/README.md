@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | `loom-verl` | VERL 原生 FSDP + vLLM | 已完成 100 步训练及完整验证，准确率 7.62% → 20.90%；75 项测试通过 |
 | `loom-slime` | slime 原生 Megatron + SGLang | 已安装；H100 单卡 MemAgent 连续两轮训练、保存和评估通过 |
-| `loom-skyrl` | SkyRL 原生 FSDP + vLLM | Python 3.12 基础环境已创建，后端安装与训练验证待完成 |
+| `loom-skyrl` | SkyRL 0.3.0 + PyTorch 2.11.0/cu128 + vLLM 0.23.0/cu129 | 核心依赖已安装，BF16 GPU 运算通过；FlashAttention 构建和训练验证进行中，见 [适配记录](skyrl.md) |
 
 ## 为什么分开
 
