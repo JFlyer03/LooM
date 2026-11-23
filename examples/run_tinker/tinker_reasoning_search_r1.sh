@@ -56,9 +56,9 @@ echo "Output: $OUTPUT_DIR"
 echo "================================================"
 
 # Run training
-uv run --isolated --locked --extra tinker --env-file .env -m loom.integrations.tinker.tinker_train \
+uv run --isolated --extra tinker --env-file .env -m skyrl_agent.integrations.tinker.tinker_train \
     model_name="$MODEL_NAME" \
-    loom_task_yaml="$TASK_YAML" \
+    skyrl_agent_task_yaml="$TASK_YAML" \
     dataset_file="$DATASET_FILE" \
     eval_dataset_file="$EVAL_DATASET_FILE" \
     batch_size="$BATCH_SIZE" \

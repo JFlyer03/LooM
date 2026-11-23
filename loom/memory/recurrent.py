@@ -1,9 +1,12 @@
+from .base import BaseMemory, GenerateMemoryText
 
-class RecurrentMemory:
-    initial_state = "No previous memory"
+
+class RecurrentMemory(BaseMemory[str]):
+    def create_state(self) -> str:
+        return "No previous memory"
 
     @staticmethod
-    async def update(state, question, chunk, generate):
+    async def update(state: str, question: str, chunk: str, generate: GenerateMemoryText) -> str:
         prompt = f"""You are presented with a problem, a section of an article that may contain the answer to the problem, and a previous memory. Please read the provided section carefully and update the memory with the new information that helps to answer the problem. Be sure to retain all relevant details from the previous memory while adding any new, useful information.
 
 <problem>\x20

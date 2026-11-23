@@ -1,6 +1,6 @@
-agent_cls: loom.agents.react.ReActAgent
+agent_cls: skyrl_agent.agents.react.ReActAgent
 
-task: loom.tasks.general_react.utils.GeneralReactTask
+task: skyrl_agent.tasks.general_react.utils.GeneralReactTask
 
 tools: ["em_finish", "local_search"]
 

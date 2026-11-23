@@ -28,7 +28,8 @@ import pickle
 import numpy as np
 import ray
 import torch
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, open_dict
+from torchdata.stateful_dataloader import StatefulDataLoader
 from tqdm import tqdm
 
 from verl import DataProto
@@ -70,6 +71,41 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._upload_refs = None
+
+    def _create_dataloader(self, train_dataset, val_dataset, collate_fn, train_sampler):
+        if val_dataset is not None or self.config.data.val_files:
+            return super()._create_dataloader(train_dataset, val_dataset, collate_fn, train_sampler)
+
+        from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler
+        from verl.utils.dataset.rl_dataset import collate_fn as default_collate_fn
+
+        data = self.config.data
+        if train_dataset is None:
+            train_dataset = create_rl_dataset(data.train_files, data, self.tokenizer, self.processor)
+        if train_sampler is None:
+            train_sampler = create_rl_sampler(data, train_dataset)
+        self.train_dataset = train_dataset
+        self.val_dataset = self.val_dataloader = self.val_reward_fn = None
+        self.train_dataloader = StatefulDataLoader(
+            dataset=train_dataset,
+            batch_size=data.get("gen_batch_size", data.train_batch_size),
+            num_workers=data.dataloader_num_workers,
+            drop_last=True,
+            collate_fn=collate_fn if collate_fn is not None else default_collate_fn,
+            sampler=train_sampler,
+        )
+        assert len(self.train_dataloader) >= 1, "Train dataloader is empty!"
+
+        steps = self.config.trainer.total_training_steps
+        if steps is None:
+            steps = len(self.train_dataloader) * self.config.trainer.total_epochs
+        self.total_training_steps = steps
+        OmegaConf.set_struct(self.config, True)
+        with open_dict(self.config):
+            if OmegaConf.select(self.config, "actor_rollout_ref.actor.optim"):
+                self.config.actor_rollout_ref.actor.optim.total_training_steps = steps
+            if OmegaConf.select(self.config, "critic.optim"):
+                self.config.critic.optim.total_training_steps = steps
 
     def init_workers(self):
         """Initialize distributed training workers using Ray backend.
@@ -771,7 +807,7 @@ class SkyAgentPPOTrainer(RayPPOTrainer):
                     self.train_dataloader.sampler.update(batch=batch)
 
                 # TODO: make a canonical logger that supports various backend
-                logger.log(data=metrics, step=self.global_steps, commit=True)
+                logger.log(data=metrics, step=self.global_steps)
 
                 progress_bar.update(1)
                 self.global_steps += 1

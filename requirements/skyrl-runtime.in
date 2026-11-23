@@ -1,4 +1,5 @@
-# Dedicated dense-model FSDP + vLLM profile for loom-skyrl (installation in progress).
+# Dedicated dense-model FSDP + vLLM profile for loom-skyrl; one-step A100 training verified.
+# Apply skyrl-router-0.1.17.patch after installing SkyRL.
 # shortcut: Llama/Qwen3 only; add upstream GDN/Mamba kernels when those models are needed.
 -r common.txt
 -r storage.txt

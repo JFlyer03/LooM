@@ -1,5 +1,5 @@
 import os
-from loom import AutoAgentRunner
+from skyrl_agent import AutoAgentRunner
 from pathlib import Path
 from transformers import AutoTokenizer
 import datasets

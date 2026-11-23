@@ -12,7 +12,7 @@ data:
 generator:
   infer_backend: skyrl-train
   backend_config: null
-  # Keep this in sync with +loom.num_trajectories at launch
+  # Keep this in sync with generator.n_samples_per_prompt at launch
   num_trajectories: 8
   max_iterations: 20
   # Keep prompt/response lengths modest for initial smoke tests; tune per model/context

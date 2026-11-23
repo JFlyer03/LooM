@@ -1,6 +1,6 @@
-agent_cls: loom.agents.oh_codeact.OHCodeActAgent
+agent_cls: skyrl_agent.agents.oh_codeact.OHCodeActAgent
 
-task: loom.tasks.swebench.utils.SWEBenchTask
+task: skyrl_agent.tasks.swebench.utils.SWEBenchTask
 
 tools:
   enable_bash_tool: false

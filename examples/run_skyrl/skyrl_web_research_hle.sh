@@ -2,6 +2,9 @@
 
 set -x
 
+# Reuse the uv environment; Ray's automatic upload omits .env and local wheels.
+export RAY_ENABLE_UV_RUN_RUNTIME_ENV=0
+
 # Basic environment setup
 export PYTHONUNBUFFERED=1
 export RUST_BACKTRACE=1
@@ -38,13 +41,13 @@ fi
 # Set a writable, shared web cache directory for the web_browser tool
 mkdir -p "${SKYAGENT_WEB_CACHE_DIR:-$DATA_DIR/web_cache}" 
 
-uv run --no-project --python "$(command -v python)" --env-file .env -m loom.integrations.skyrl_train.skyrl_train_main \
+uv run --isolated --extra skyrl-train --env-file .env -m loom.integrations.skyrl_train.skyrl_train_main  \
   data.train_data="['$TRAIN_DATA']" \
   data.val_data="['$VAL_DATA']" \
   trainer.algorithm.advantage_estimator="grpo" \
   trainer.policy.model.path="Qwen/Qwen3-8B" \
   trainer.placement.colocate_all=true \
-  trainer.strategy=fsdp2 \
+  trainer.strategy=fsdp \
   trainer.placement.policy_num_gpus_per_node=$NUM_GPUS \
   trainer.placement.ref_num_gpus_per_node=$NUM_GPUS \
   generator.inference_engine.num_engines=$NUM_GPUS \
@@ -86,4 +89,4 @@ uv run --no-project --python "$(command -v python)" --env-file .env -m loom.inte
   trainer.ckpt_path="$CKPT_DIR" \
   trainer.export_path="$EXPORT_DIR" \
   trainer.dump_data_batch=true \
-  $@
+  "$@"

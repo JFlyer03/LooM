@@ -318,14 +318,19 @@ class TaskRunner:
         # Load the reward manager for training and validation.
         # 配置 reward manager，训练和验证使用不同的 reward manager
         reward_fn = SkyAgentRewardManager(tokenizer, num_examine=0, **config.reward_model.get("reward_kwargs", {}))
-        val_reward_fn = SkyAgentRewardManager(tokenizer, num_examine=1, **config.reward_model.get("reward_kwargs", {}))
+        val_reward_fn = None
+        val_dataset = None
 
         from verl.utils.dataset.rl_dataset import collate_fn
 
         # Create training and validation datasets.
         # 创建训练集和测试集
         train_dataset = create_rl_dataset(config.data.train_files, config.data, tokenizer, processor, is_train=True)
-        val_dataset = create_rl_dataset(config.data.val_files, config.data, tokenizer, processor, is_train=False)
+        if config.data.val_files:
+            val_reward_fn = SkyAgentRewardManager(tokenizer, num_examine=1, **config.reward_model.get("reward_kwargs", {}))
+            val_dataset = create_rl_dataset(config.data.val_files, config.data, tokenizer, processor, is_train=False)
+        elif config.trainer.get("val_only", False):
+            raise ValueError("Validation-only mode requires data.val_files")
         # hack for using only swe bench hard
         # Dacheng: Delete this hack now, we need to train for other tasks than swe
         # mask = val_dataset.dataframe.apply(lambda x: x['instance']["difficulty"] == "1-4 hours", axis=1)

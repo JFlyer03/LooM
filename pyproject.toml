@@ -53,9 +53,62 @@ verl = [
     "sentencepiece>=0.2.1,<1",
 ]
 
+# Local wheels include the tested A100 FlashAttention build and the router compatibility patch.
+skyrl-train = [
+    "skyrl[skyrl-train]==0.3.0",
+    "torch==2.11.0+cu128",
+    "torchvision==0.26.0+cu128",
+    "torchaudio==2.11.0+cu128",
+    "vllm==0.23.0+cu129",
+    "flash-attn==2.8.3",
+    "cuda-toolkit[nvcc]==12.8.1",
+    "cupy-cuda12x==13.6.0",
+    "transformers==5.8.0",
+    "peft==0.18.1",
+    "ray[default]==2.56.0",
+    "torchdata==0.11.0",
+    "tensordict==0.10.0",
+    "datasets==4.0.0",
+    "fsspec==2025.3.0",
+    "s3fs==2025.3.0",
+    "aiobotocore==2.23.0",
+    "boto3==1.38.27",
+    "botocore==1.38.27",
+    "numpy==2.3.5",
+    "pandas==2.3.3",
+    "protobuf==6.33.6",
+    "nixl==0.7.0",
+    "vllm-router==0.1.17",
+    "quack-kernels==0.3.3",
+    "setuptools==80.10.2",
+    "litellm>=1.63,<2",
+    "swanlab>=0.7.6,<1",
+    "openai>=2.6.1,<3",
+    "python-dotenv>=1.2.1,<2",
+    "sentencepiece>=0.2.1,<1",
+    "safetensors>=0.6.2,<1",
+    "neo4j>=6.1,<7",
+    "pymilvus>=2.6.6,<3",
+]
+
 [tool.uv]
 environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
-conflicts = [[{extra = "verl"}, {extra = "tinker"}]]
+conflicts = [[{extra = "verl"}, {extra = "tinker"}, {extra = "skyrl-train"}]]
+find-links = [".backend-wheels/skyrl"]
+
+[tool.uv.sources]
+skyrl = {path = ".backend-wheels/skyrl/skyrl-0.3.0-py3-none-any.whl", extra = "skyrl-train"}
+flash-attn = {path = ".backend-wheels/skyrl/flash_attn-2.8.3-cp312-cp312-linux_x86_64.whl", extra = "skyrl-train"}
+torch = {path = ".backend-wheels/skyrl/torch-2.11.0+cu128-cp312-cp312-manylinux_2_28_x86_64.whl", extra = "skyrl-train"}
+torchvision = {path = ".backend-wheels/skyrl/torchvision-0.26.0+cu128-cp312-cp312-manylinux_2_28_x86_64.whl", extra = "skyrl-train"}
+torchaudio = {path = ".backend-wheels/skyrl/torchaudio-2.11.0+cu128-cp312-cp312-manylinux_2_28_x86_64.whl", extra = "skyrl-train"}
+vllm = {path = ".backend-wheels/skyrl/vllm-0.23.0+cu129-cp38-abi3-manylinux_2_28_x86_64.whl", extra = "skyrl-train"}
+
+# GitHub does not serve wheel metadata separately; avoid downloading the VERL wheel just to lock.
+[[tool.uv.dependency-metadata]]
+name = "flash-attn"
+version = "2.7.4.post1+cu12torch2.6cxx11abifalse"
+requires-dist = ["torch", "einops"]
 
 [tool.setuptools.packages.find]
 include = ["loom", "loom.*"]

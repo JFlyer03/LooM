@@ -1,5 +1,8 @@
 set -x
 
+# Reuse the uv environment; Ray's automatic upload omits .env and local wheels.
+export RAY_ENABLE_UV_RUN_RUNTIME_ENV=0
+
 DATA_DIR="/mnt/shared_storage/datasets/r2e-all"
 TRAIN_DATA="${DATA_DIR}/train.parquet"
 VAL_DATA="${DATA_DIR}/validation.parquet"
@@ -21,18 +24,14 @@ seed=1
 
 # export LD_LIBRARY_PATH="/opt/amazon/efa/lib:$LD_LIBRARY_PATH"
 
-uv run --no-project --python "$(command -v python)" --env-file .env \
-    --with vllm==0.9.2 \
-    --with transformers==4.53.0 \
-    --with torch==2.7.0 \
-    --with "flash-attn@https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiTRUE-cp312-cp312-linux_x86_64.whl" \
+uv run --isolated --extra skyrl-train --env-file .env \
     -m loom.integrations.skyrl_train.skyrl_train_main  \
   data.train_data="['$TRAIN_DATA']" \
   data.val_data="['$VAL_DATA']" \
   trainer.algorithm.advantage_estimator="loop" \
   trainer.policy.model.path=$MODEL \
   trainer.placement.colocate_all=true \
-  trainer.strategy=fsdp2 \
+  trainer.strategy=fsdp \
   trainer.placement.policy_num_gpus_per_node=$NUM_GPUS \
   trainer.placement.ref_num_gpus_per_node=$NUM_GPUS \
   generator.inference_engine.num_engines=$NUM_INFERENCE_ENGINES \
@@ -82,4 +81,4 @@ uv run --no-project --python "$(command -v python)" --env-file .env \
   trainer.export_path="$EXPORT_DIR" \
   trainer.dump_data_batch=true \
   generator.inference_engine.max_num_batched_tokens=16384 \
-  $@
+  "$@"

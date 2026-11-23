@@ -1,12 +1,50 @@
 # SkyRL-Train 环境依赖调研
 
-## 本机独立环境安装进度（2026-11-22）
+## 本机独立环境与训练验证（2026-11-22）
 
 已创建 `loom-skyrl`，路径为 `/disk0/home/jiangfeibing/miniconda3/envs/loom-skyrl`。
 已安装 Python 3.12.16、SkyRL 0.3.0、PyTorch 2.11.0+cu128、vLLM 0.23.0+cu129、
 Ray 2.56.0、Transformers 5.8.0；依赖一致性检查和 GPU 0 的 BF16 矩阵运算通过。
 FlashAttention 2.8.3 已使用 CUDA 12.8.93 / GCC 9 为 A100 编译安装，GPU 前向、反向
-及与 PyTorch SDPA 的数值对比通过；LooM SkyRL 入口导入通过。单步训练验证进行中。
+及与 PyTorch SDPA 的数值对比通过；LooM SkyRL 入口导入通过。
+
+GPU 0 上的本地小 Llama 已通过 SkyRL 原生 FSDP + vLLM 的单步 GRPO 训练：
+1 条 prompt、每条生成 2 个样本、每个样本生成 8 tokens，测试奖励为固定的 0 / 1。
+`grad_norm=4.244359`，导出后检查到 21 个参数张量变化，验证进程退出码为 0。
+日志为 `/tmp/loom-skyrl-smoke.log`，导出模型位于
+`/tmp/loom-skyrl-smoke/exports/global_step_1/policy/model.safetensors`。
+测试使用固定 64 MiB KV cache，以减少共享 GPU 上的显存占用。
+
+使用方式：
+
+```bash
+conda activate loom-skyrl
+cd /disk0/home/jiangfeibing/projects/LooM
+python -m loom.integrations.skyrl_train.skyrl_train_main <训练配置参数>
+```
+
+`pyproject.toml` 现已提供互斥的 `skyrl-train` extra，并在 `uv.lock` 中锁定。
+在本机先激活 `loom-skyrl`，以加载 CUDA 兼容库、编译器和代理绕过设置，随后可以运行：
+
+```bash
+RAY_ENABLE_UV_RUN_RUNTIME_ENV=0 uv run --isolated --extra skyrl-train --env-file .env \
+  -m loom.integrations.skyrl_train.skyrl_train_main <训练配置参数>
+# 或使用示例中的多卡配置
+bash examples/run_skyrl/run_skyrl_swe.sh
+```
+
+uv 单独安装和管理 Python 依赖，不直接使用 conda 中的 Python 包。
+本机 wheel 缓存位于 `.backend-wheels/skyrl/`，包含已校验的 CUDA wheel、
+本地编译的 FlashAttention 2.8.3，以及应用下述 router 补丁后重新打包的 SkyRL 0.3.0。
+uv 从本地 wheel 安装 SkyRL 时已包含补丁，无需再次修改 isolated 环境。
+两个启动脚本已设置 `RAY_ENABLE_UV_RUN_RUNTIME_ENV=0`，使 Ray worker 复用 driver
+的 uv 解释器，避免自动上传项目后找不到 `.env` 和被忽略的本地 wheel。
+
+2026-11-22 已通过上述 uv isolated 方式运行同一个单步训练检查：FlashAttention GPU
+前后向、LooM 入口导入、vLLM 生成、SkyRL GRPO 更新及权重导出均通过，
+`grad_norm=4.244359`，21 个参数张量变化，进程退出码为 0。
+uv 验证日志为 `/tmp/loom-skyrl-uv-smoke.log`；373 个包的锁文件一致性检查和
+SWE 脚本完整配置校验均通过。已有缓存时本次 isolated 环境安装 278 个包耗时 487 ms。
 
 SkyRL 0.3.0 的 router 状态日志访问了 vllm-router 0.1.17 不存在的可选字段，
 本环境应用了 [一行兼容补丁](skyrl-router-0.1.17.patch)，使缺失字段按 False 处理。
@@ -27,6 +65,13 @@ CUDA 12.9 forward-compat 用户态库位于本项目 `.backend-src/cuda-compat-1
 不会替换系统 550 驱动。此目录需要保留。
 
 以下为安装前的依赖调研记录。
+
+本次实测范围为 A100 单卡、dense 小模型、单步训练及 LooM 入口导入；未验证大模型、
+多卡、GDN/Mamba 或完整 LooM Agent 任务。uv 配置引用本机 `.backend-wheels/skyrl/`
+下的 wheel，需保留该目录；在其他节点运行时也需要准备相同文件和 CUDA 运行设置。
+多节点还需确保所有 Ray 节点都能访问 driver 使用的 uv 环境路径。
+SWE 示例的 Agent/Task 另外依赖 OpenHands、容器运行时和相应数据；这些任务组件
+不包含在本次 SkyRL GPU 后端 extra 中。
 
 采集日期：2026-11-19。目标是 LooM 的 FSDP/FSDP2 训练 + vLLM 推理，
 本机驱动 550.90.07、CUDA Toolkit 12.4.131、glibc 2.31、Python 3.12。

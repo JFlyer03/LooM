@@ -15,7 +15,7 @@ class LongContextMemoryTrajectory(BaseTrajectory):
             infer_engine=self.infer_engine,
             tokenizer=self.tokenizer,
         )
-        self.initial_memory = self.agent.memory.initial_state   # 初始记忆
+        self.initial_memory = self.agent.memory.create_state()
         answer = await self.agent.run(
             self.task.get_instruction(self.instance), self.instance["context"], self.initial_memory,
         )
